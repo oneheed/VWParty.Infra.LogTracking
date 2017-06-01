@@ -1,0 +1,23 @@
+stages:
+- build
+
+variables:
+  BUILD_VERSION: "0.1.0"
+  NUGET_APIKEY: "0F2DB634-4E83-4659-8068-EF552DDC4072"
+  NUGET_SERVER: "http://172.20.5.15/nugetServer/"
+
+before_script:
+  - set
+  - if %CI_BUILD_REF_NAME% == master  set BUILD_TARGET=
+  - if %CI_BUILD_REF_NAME% == develop set BUILD_TARGET=-BETA
+
+develop_build_job:
+  stage: build
+  only:
+  - master
+  - develop
+  script:
+  - c:\Multi-Runner\nuget.exe restore
+  - '"c:\Program Files (x86)\MSBuild\14.0\Bin\amd64\MSBuild.exe" /p:Configuration=Release /p:Platform="Any CPU" VWParty.Infra.LogTracking.sln'
+  - c:\Multi-Runner\nuget.exe pack VWParty.Infra.LogTracking\VWParty.Infra.LogTracking.csproj -Properties Configuration=Release -Version %BUILD_VERSION%%BUILD_TARGET%
+  - c:\Multi-Runner\nuget.exe push VWParty.Infra.LogTracking.%BUILD_VERSION%%BUILD_TARGET%.nupkg -ApiKey %NUGET_APIKEY% -Source %NUGET_SERVER%

@@ -11,6 +11,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "POC.WebAPI2", "POC.WebAPI2\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VWParty.Infra.LogTracking", "VWParty.Infra.LogTracking\VWParty.Infra.LogTracking.csproj", "{55496741-4F8E-42D5-BD17-D5583A20AA67}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6B88BE73-7716-4B5D-9F0C-4B0C2BCFE285}"
+	ProjectSection(SolutionItems) = preProject
+		.gitlab-ci.yml = .gitlab-ci.yml
+		build.cmd = build.cmd
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
