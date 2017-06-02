@@ -27,7 +27,7 @@ namespace POC.WebAPI1.Controllers
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public string Get(int id)
         {
-            HttpClient client = new HttpClient(new LogTrackerHandler());
+            HttpClient client = new HttpClient(new LogTrackerHandler(LogTrackerContext.Current));
             client.BaseAddress = new Uri("http://localhost:31604/");
             client.GetAsync("/api/values/867").Wait();
 

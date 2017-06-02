@@ -13,7 +13,7 @@ namespace VWParty.Infra.LogTracking
     {
         public LogTrackerHandler()
         {
-            this._context = LogTrackerContext.Create();
+            this._context = LogTrackerContext.Current ?? LogTrackerContext.Create();
         }
 
         public LogTrackerHandler(LogTrackerContext context)

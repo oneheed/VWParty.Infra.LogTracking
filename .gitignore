@@ -243,3 +243,5 @@ ModelManifest.xml
 .fake/
 /builds/0/project-1/
 
+/POC.WebAPI1/App_Data/Logs
+/POC.WebAPI2/App_Data/Logs

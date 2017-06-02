@@ -18,6 +18,9 @@ namespace VWParty.Infra.LogTracking
 
     public class LogTrackerContext
     {
+        /// <summary>
+        /// prevent user to create LogTrackerContext itself.
+        /// </summary>
         private LogTrackerContext()
         {
 
@@ -56,28 +59,22 @@ namespace VWParty.Infra.LogTracking
                         _KEY_REQUEST_START_UTCTIME,
                         requestStartTimeUTC.ToString("u"));
 
-                    return new LogTrackerContext()
-                    {
-                        StorageType = LogTrackerContextStorageTypeEnum.ASPNET_HTTPCONTEXT
-                    };
+                    return Current;
 
                 case LogTrackerContextStorageTypeEnum.THREAD_DATASLOT:
 
                     _thread_static_request_id = requestId;
                     _thread_static_request_start_utctime = requestStartTimeUTC;
 
-                    return new LogTrackerContext()
-                    {
-                        StorageType = LogTrackerContextStorageTypeEnum.THREAD_DATASLOT
-                    };
+                    return Current;
 
                 case LogTrackerContextStorageTypeEnum.NONE:
 
                     return new LogTrackerContext()
                     {
                         StorageType = LogTrackerContextStorageTypeEnum.NONE,
-                        _local_request_id = requestId,
-                        _local_request_start_utctime = requestStartTimeUTC
+                        RequestId = requestId,
+                        RequestStartTimeUTC = requestStartTimeUTC
                     };
 
                 case LogTrackerContextStorageTypeEnum.OWIN_CONTEXT:
@@ -118,10 +115,7 @@ namespace VWParty.Infra.LogTracking
             }
         }
 
-        internal static LogTrackerContext Init()
-        {
-            throw new NotImplementedException();
-        }
+
 
         public static LogTrackerContext Current
         {
@@ -132,7 +126,27 @@ namespace VWParty.Infra.LogTracking
                     // match in httpcontext
                     return new LogTrackerContext()
                     {
-                        StorageType = LogTrackerContextStorageTypeEnum.ASPNET_HTTPCONTEXT
+                        StorageType = LogTrackerContextStorageTypeEnum.ASPNET_HTTPCONTEXT,
+                        RequestId = HttpContext.Current.Request.Headers.Get(_KEY_REQUEST_ID),
+                        RequestStartTimeUTC = DateTimeOffset.Parse(HttpContext.Current.Request.Headers.Get(_KEY_REQUEST_START_UTCTIME)).UtcDateTime
+                    };
+                }
+                else if (false) // TODO: check OWIN environment
+                {
+                    return new LogTrackerContext()
+                    {
+                        StorageType = LogTrackerContextStorageTypeEnum.OWIN_CONTEXT,
+                        RequestId = null,
+                        RequestStartTimeUTC = DateTime.MinValue
+                    };
+                }
+                else if (string.IsNullOrEmpty(_thread_static_request_id) == false) // check thread environment
+                {
+                    return new LogTrackerContext()
+                    {
+                        StorageType = LogTrackerContextStorageTypeEnum.THREAD_DATASLOT,
+                        RequestId = _thread_static_request_id,
+                        RequestStartTimeUTC = _thread_static_request_start_utctime
                     };
                 }
 
@@ -159,42 +173,47 @@ namespace VWParty.Infra.LogTracking
 
         public string RequestId
         {
-            get
-            {
-                switch (this.StorageType)
-                {
-                    case LogTrackerContextStorageTypeEnum.ASPNET_HTTPCONTEXT:
-                        return HttpContext.Current.Request.Headers.Get(_KEY_REQUEST_ID);
+            //get
+            //{
+            //    switch (this.StorageType)
+            //    {
+            //        case LogTrackerContextStorageTypeEnum.ASPNET_HTTPCONTEXT:
+            //            return HttpContext.Current.Request.Headers.Get(_KEY_REQUEST_ID);
 
-                    case LogTrackerContextStorageTypeEnum.THREAD_DATASLOT:
-                        return _thread_static_request_id;
+            //        case LogTrackerContextStorageTypeEnum.THREAD_DATASLOT:
+            //            return _thread_static_request_id;
 
-                    case LogTrackerContextStorageTypeEnum.NONE:
-                        return this._local_request_id;
+            //        case LogTrackerContextStorageTypeEnum.NONE:
+            //            return this._local_request_id;
 
-                }
-                throw new NotSupportedException();
-            }
+            //    }
+            //    throw new NotSupportedException();
+            //}
+
+            get;
+            private set;
         }
 
         public DateTime RequestStartTimeUTC
         {
-            get
-            {
-                switch (this.StorageType)
-                {
-                    case LogTrackerContextStorageTypeEnum.ASPNET_HTTPCONTEXT:
-                        DateTimeOffset dto = DateTimeOffset.Parse(HttpContext.Current.Request.Headers.Get(_KEY_REQUEST_START_UTCTIME));
-                        return dto.UtcDateTime;
+            //get
+            //{
+            //    switch (this.StorageType)
+            //    {
+            //        case LogTrackerContextStorageTypeEnum.ASPNET_HTTPCONTEXT:
+            //            DateTimeOffset dto = DateTimeOffset.Parse(HttpContext.Current.Request.Headers.Get(_KEY_REQUEST_START_UTCTIME));
+            //            return dto.UtcDateTime;
 
-                    case LogTrackerContextStorageTypeEnum.THREAD_DATASLOT:
-                        return _thread_static_request_start_utctime;
+            //        case LogTrackerContextStorageTypeEnum.THREAD_DATASLOT:
+            //            return _thread_static_request_start_utctime;
 
-                    case LogTrackerContextStorageTypeEnum.NONE:
-                        return this._local_request_start_utctime;
-                }
-                throw new NotSupportedException();
-            }
+            //        case LogTrackerContextStorageTypeEnum.NONE:
+            //            return this._local_request_start_utctime;
+            //    }
+            //    throw new NotSupportedException();
+            //}
+            get;
+            private set;
         }
 
         public TimeSpan RequestExecutingTime
