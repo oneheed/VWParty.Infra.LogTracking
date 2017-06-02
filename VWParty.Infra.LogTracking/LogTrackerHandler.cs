@@ -11,22 +11,30 @@ namespace VWParty.Infra.LogTracking
 {
     public class LogTrackerHandler : HttpClientHandler
     {
+        public LogTrackerHandler()
+        {
+            this._context = LogTrackerContext.Create();
+        }
+
+        public LogTrackerHandler(LogTrackerContext context)
+        {
+            this._context = context;
+        }
+
+        private LogTrackerContext _context = null;
+
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            if (HttpContext.Current != null && string.IsNullOrEmpty(HttpContext.Current.Request.Headers.Get("X-REQUEST-ID")) == false)
-            {
-                request.Headers.Add("X-REQUEST-ID", HttpContext.Current.Request.Headers.Get("X-REQUEST-ID"));
-                request.Headers.Add("X-REQUEST-UTCTIME", HttpContext.Current.Request.Headers.Get("X-REQUEST-UTCTIME"));
-            }
-            else if (false)
-            {
-                // check owin context
-            }
-            else
-            {
-                request.Headers.Add("X-REQUEST-ID", Guid.NewGuid().ToString());
-                request.Headers.Add("X-REQUEST-UTCTIME", DateTime.UtcNow.ToString("s"));
-            }
+            //LogTrackerContext ltc = LogTrackerContext.Current ?? LogTrackerContext.Init();
+
+            request.Headers.Add(
+                LogTrackerContext._KEY_REQUEST_ID,
+                this._context.RequestId);
+
+            request.Headers.Add(
+                LogTrackerContext._KEY_REQUEST_START_UTCTIME,
+                this._context.RequestStartTimeUTC.ToString("u"));
+            
 
             return base.SendAsync(request, cancellationToken);
         }

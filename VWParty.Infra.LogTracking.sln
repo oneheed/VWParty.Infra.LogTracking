@@ -13,6 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VWParty.Infra.LogTracking",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6B88BE73-7716-4B5D-9F0C-4B0C2BCFE285}"
 	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
 		.gitlab-ci.yml = .gitlab-ci.yml
 		build.cmd = build.cmd
 	EndProjectSection

@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="LogTrackerAttribute.cs" />
+    <Compile Include="LogTrackerContext.cs" />
     <Compile Include="LogTrackerHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

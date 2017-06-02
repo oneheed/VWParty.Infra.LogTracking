@@ -31,7 +31,7 @@ namespace POC.WebAPI1.Controllers
             client.BaseAddress = new Uri("http://localhost:31604/");
             client.GetAsync("/api/values/867").Wait();
 
-            _log.Info("hello: " + this.Request.Headers.GetValues("X-REQUEST-ID"));
+            _log.Info("[req: {0}] hello! ", LogTrackerContext.Current.RequestId);
 
             return "value";
         }
