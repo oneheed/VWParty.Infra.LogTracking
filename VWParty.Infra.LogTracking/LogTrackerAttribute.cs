@@ -30,18 +30,25 @@ namespace VWParty.Infra.LogTracking
                 LogTrackerContext.Init(LogTrackerContextStorageTypeEnum.ASPNET_HTTPCONTEXT);
             }
 
-            _log.Info(
+            //_log.Info(
+            //    "before call (req id: {0}, utctime: {1}, execute-ms: {2})",
+            //    LogTrackerContext.Current.RequestId,
+            //    LogTrackerContext.Current.RequestStartTimeUTC,
+            //    LogTrackerContext.Current.RequestExecutingTime.TotalMilliseconds);
+
+            _log.Info(string.Format(
                 "before call (req id: {0}, utctime: {1}, execute-ms: {2})",
                 LogTrackerContext.Current.RequestId,
                 LogTrackerContext.Current.RequestStartTimeUTC,
-                LogTrackerContext.Current.RequestExecutingTime.TotalMilliseconds);
+                LogTrackerContext.Current.RequestExecutingTime.TotalMilliseconds));
 
-            _log.Info("-----------------------------------------------------------------------");
-            foreach (var header in actionContext.Request.Headers)
-            {
-                _log.Info("- header [{0}]: {1}", header.Key, header.Value.FirstOrDefault());
-            }
-            _log.Info("-----------------------------------------------------------------------");
+
+            //_log.Info("-----------------------------------------------------------------------");
+            //foreach (var header in actionContext.Request.Headers)
+            //{
+            //    _log.Info("- header [{0}]: {1}", header.Key, header.Value.FirstOrDefault());
+            //}
+            //_log.Info("-----------------------------------------------------------------------");
 
             base.OnActionExecuting(actionContext);
         }
@@ -49,24 +56,19 @@ namespace VWParty.Infra.LogTracking
         public override void OnActionExecuted(HttpActionExecutedContext actionExecutedContext)
         {
             Logger _log = LogManager.GetLogger("LogTracker", actionExecutedContext.ActionContext.ControllerContext.Controller.GetType());
-            //_log.Info(
-            //    "after call (req id: {0}, utctime: {1}, utcnow: {2})",
-            //    actionExecutedContext.Request.Headers.GetValues("X-REQUEST-ID").FirstOrDefault(),
-            //    actionExecutedContext.Request.Headers.GetValues("X-REQUEST-UTCTIME").FirstOrDefault(),
-            //    DateTime.UtcNow);
 
-            _log.Info(
+            //_log.Info(
+            //    "after call (req id: {0}, utctime: {1}, execute-ms: {2})",
+            //    LogTrackerContext.Current.RequestId,
+            //    LogTrackerContext.Current.RequestStartTimeUTC,
+            //    LogTrackerContext.Current.RequestExecutingTime.TotalMilliseconds);
+
+            _log.Info(string.Format(
                 "after call (req id: {0}, utctime: {1}, execute-ms: {2})",
                 LogTrackerContext.Current.RequestId,
                 LogTrackerContext.Current.RequestStartTimeUTC,
-                LogTrackerContext.Current.RequestExecutingTime.TotalMilliseconds);
+                LogTrackerContext.Current.RequestExecutingTime.TotalMilliseconds));
 
-            //actionExecutedContext.Response.Headers.Add(
-            //    "X-REQUEST-ID",
-            //    actionExecutedContext.Request.Headers.GetValues("X-REQUEST-ID").FirstOrDefault());
-            //actionExecutedContext.Response.Headers.Add(
-            //    "X-REQUEST-UTCTIME",
-            //    actionExecutedContext.Request.Headers.GetValues("X-REQUEST-UTCTIME").FirstOrDefault());
 
             actionExecutedContext.Response.Headers.Add(
                 LogTrackerContext._KEY_REQUEST_ID,
