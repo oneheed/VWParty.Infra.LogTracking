@@ -128,7 +128,8 @@ namespace VWParty.Infra.LogTracking
                     {
                         StorageType = LogTrackerContextStorageTypeEnum.ASPNET_HTTPCONTEXT,
                         RequestId = HttpContext.Current.Request.Headers.Get(_KEY_REQUEST_ID),
-                        RequestStartTimeUTC = DateTimeOffset.Parse(HttpContext.Current.Request.Headers.Get(_KEY_REQUEST_START_UTCTIME)).UtcDateTime
+                        RequestStartTimeUTC = //DateTimeOffset.Parse(HttpContext.Current.Request.Headers.Get(_KEY_REQUEST_START_UTCTIME)).UtcDateTime
+                            DateTime.Parse(HttpContext.Current.Request.Headers.Get(_KEY_REQUEST_START_UTCTIME)).ToUniversalTime()
                     };
                 }
                 else if (false) // TODO: check OWIN environment
