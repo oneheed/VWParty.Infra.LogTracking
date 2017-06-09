@@ -39,7 +39,7 @@ namespace VWParty.Infra.LogTracking
         {
             return Init(
                 type,
-                Guid.NewGuid().ToString("N"),
+                Guid.NewGuid().ToString(),
                 DateTime.UtcNow);
         }
 
