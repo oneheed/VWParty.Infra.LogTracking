@@ -35,7 +35,7 @@ namespace VWParty.Infra.LogTracking
             return LogTrackerContext.Init(LogTrackerContextStorageTypeEnum.NONE);
         }
 
-        public static LogTrackerContext Init(LogTrackerContextStorageTypeEnum type)
+        public static LogTrackerContext Init(LogTrackerContextStorageTypeEnum type) 
         {
             return Init(
                 type,
