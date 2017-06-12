@@ -39,7 +39,7 @@ namespace VWParty.Infra.LogTracking
                     ExtraData = new Dictionary<string, object>()
                     {
                         { "url", actionContext.Request.RequestUri.AbsoluteUri },
-                        { "request_start_time_utc", LogTrackerContext.Current.RequestStartTimeUTC.ToString("u") },
+                        { "request_start_time_utc", LogTrackerContext.Current.RequestStartTimeUTC_Text },
                         { "request_execute_time_ms", LogTrackerContext.Current.RequestExecutingTime.TotalMilliseconds.ToString("000000.000") }
                     }
                 });
@@ -69,7 +69,7 @@ namespace VWParty.Infra.LogTracking
                     ExtraData = new Dictionary<string, object>()
                     {
                         { "url", actionExecutedContext.Request.RequestUri.AbsoluteUri },
-                        { "request_start_time_utc", LogTrackerContext.Current.RequestStartTimeUTC.ToString("u") },
+                        { "request_start_time_utc", LogTrackerContext.Current.RequestStartTimeUTC_Text },
                         { "request_execute_time_ms", LogTrackerContext.Current.RequestExecutingTime.TotalMilliseconds.ToString("000000.000") }
                     }
                 });
@@ -79,7 +79,7 @@ namespace VWParty.Infra.LogTracking
 
                 actionExecutedContext.Response.Headers.Add(
                     LogTrackerContext._KEY_REQUEST_START_UTCTIME,
-                    LogTrackerContext.Current.RequestStartTimeUTC.ToString("u"));
+                    LogTrackerContext.Current.RequestStartTimeUTC_Text);
             }
             catch (Exception ex)
             {

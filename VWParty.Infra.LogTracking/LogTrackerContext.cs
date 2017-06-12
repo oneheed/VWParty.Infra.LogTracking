@@ -30,10 +30,6 @@ namespace VWParty.Infra.LogTracking
         public const string _KEY_REQUEST_START_UTCTIME = "X-REQUEST-START-UTCTIME";
 
 
-        public static LogTrackerContext Create()
-        {
-            return LogTrackerContext.Init(LogTrackerContextStorageTypeEnum.NONE);
-        }
 
         public static LogTrackerContext Init(LogTrackerContextStorageTypeEnum type)
         {
@@ -41,6 +37,15 @@ namespace VWParty.Infra.LogTracking
                 type,
                 Guid.NewGuid().ToString(),
                 DateTime.UtcNow);
+        }
+
+
+        public static LogTrackerContext Init(LogTrackerContextStorageTypeEnum type, LogTrackerContext context)
+        {
+            return Init(
+                type,
+                context.RequestId,
+                context.RequestStartTimeUTC);
         }
 
         public static LogTrackerContext Init(LogTrackerContextStorageTypeEnum type, string requestId, DateTime requestStartTimeUTC)
@@ -57,7 +62,7 @@ namespace VWParty.Infra.LogTracking
 
                     HttpContext.Current.Request.Headers.Add(
                         _KEY_REQUEST_START_UTCTIME,
-                        requestStartTimeUTC.ToString("u"));
+                        requestStartTimeUTC.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'"));
 
                     return Current;
 
@@ -84,6 +89,7 @@ namespace VWParty.Infra.LogTracking
 
             throw new NotSupportedException();
         }
+
 
         public static void Clean()
         {
@@ -215,6 +221,14 @@ namespace VWParty.Infra.LogTracking
             //}
             get;
             private set;
+        }
+
+        public string RequestStartTimeUTC_Text
+        {
+            get
+            {
+                return this.RequestStartTimeUTC.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
+            }
         }
 
         public TimeSpan RequestExecutingTime

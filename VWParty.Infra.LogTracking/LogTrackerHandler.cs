@@ -13,7 +13,7 @@ namespace VWParty.Infra.LogTracking
     {
         public LogTrackerHandler()
         {
-            this._context = LogTrackerContext.Current ?? LogTrackerContext.Create();
+            this._context = LogTrackerContext.Current ?? LogTrackerContext.Init(LogTrackerContextStorageTypeEnum.NONE);
         }
 
         public LogTrackerHandler(LogTrackerContext context)
@@ -33,7 +33,7 @@ namespace VWParty.Infra.LogTracking
 
             request.Headers.Add(
                 LogTrackerContext._KEY_REQUEST_START_UTCTIME,
-                this._context.RequestStartTimeUTC.ToString("u"));
+                this._context.RequestStartTimeUTC_Text);
             
 
             return base.SendAsync(request, cancellationToken);
