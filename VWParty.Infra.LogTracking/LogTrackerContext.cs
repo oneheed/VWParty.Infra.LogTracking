@@ -67,7 +67,7 @@ namespace VWParty.Infra.LogTracking
                     return Current;
 
                 case LogTrackerContextStorageTypeEnum.THREAD_DATASLOT:
-
+                    _thread_static_is_set = true;
                     _thread_static_request_id = requestId;
                     _thread_static_request_start_utctime = requestStartTimeUTC;
 
@@ -110,6 +110,7 @@ namespace VWParty.Infra.LogTracking
                     break;
 
                 case LogTrackerContextStorageTypeEnum.THREAD_DATASLOT:
+                    _thread_static_is_set = false;
                     _thread_static_request_id = null;
                     _thread_static_request_start_utctime = DateTime.MinValue;
                     break;
@@ -147,7 +148,7 @@ namespace VWParty.Infra.LogTracking
                         RequestStartTimeUTC = DateTime.MinValue
                     };
                 }
-                else if (string.IsNullOrEmpty(_thread_static_request_id) == false) // check thread environment
+                else if (_thread_static_is_set == true) // check thread environment
                 {
                     return new LogTrackerContext()
                     {
@@ -168,6 +169,8 @@ namespace VWParty.Infra.LogTracking
         }
 
 
+        [ThreadStatic]
+        private static bool _thread_static_is_set = false;
 
         [ThreadStatic]
         private static string _thread_static_request_id = null;
@@ -175,8 +178,8 @@ namespace VWParty.Infra.LogTracking
         [ThreadStatic]
         private static DateTime _thread_static_request_start_utctime = DateTime.MinValue;
 
-        private string _local_request_id = null;
-        private DateTime _local_request_start_utctime = DateTime.MinValue;
+        //private string _local_request_id = null;
+        //private DateTime _local_request_start_utctime = DateTime.MinValue;
 
         public string RequestId
         {
