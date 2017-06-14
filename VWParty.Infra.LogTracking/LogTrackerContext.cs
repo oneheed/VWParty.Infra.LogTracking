@@ -128,6 +128,18 @@ namespace VWParty.Infra.LogTracking
         {
             get
             {
+                HttpContext _context = null;
+
+                try
+                {
+                    _context = HttpContext.Current;
+                }
+                catch(System.Web.HttpException)
+                {
+                    // in app_start or app_end event handler
+                    return null;
+                }
+
                 if (HttpContext.Current != null && string.IsNullOrEmpty(HttpContext.Current.Request.Headers.Get(_KEY_REQUEST_ID)) == false)
                 {
                     // match in httpcontext
