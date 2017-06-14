@@ -1,5 +1,4 @@
 ﻿using NLog;
-using Mnemosyne;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +12,7 @@ namespace VWParty.Infra.LogTracking
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
     public class LogTrackerAttribute : ActionFilterAttribute
     {
-        private static MnemosyneLogger _logger = new MnemosyneLogger(LogManager.GetCurrentClassLogger());
+        private static LogTrackerLogger _logger = new LogTrackerLogger(LogManager.GetCurrentClassLogger());
 
         public override void OnActionExecuting(HttpActionContext actionContext)
         {

@@ -253,5 +253,13 @@ namespace VWParty.Infra.LogTracking
                 return DateTime.UtcNow - this.RequestStartTimeUTC;
             }
         }
+
+        public string RequestExecutingTime_Text
+        {
+            get
+            {
+                return (DateTime.UtcNow - this.RequestStartTimeUTC).TotalMilliseconds.ToString("000000.000");
+            }
+        }
     }
 }
