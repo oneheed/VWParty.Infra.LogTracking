@@ -19,12 +19,17 @@ namespace VWParty.Infra.LogTracking
             Logger _log = LogManager.GetLogger("LogTracker", actionContext.ControllerContext.Controller.GetType());
             try
             {
+                //
+                // TODO: 後續版本必須移除。LogTrackerContext 不應該 "全自動" 的產生，必須有明確進入點才能建立新的 LogTrackerContext.
+                //
                 if (LogTrackerContext.Current == null)
                 {
                     _log.Info("creating request_id and request_start_time_utc.");
-                    LogTrackerContext.Init(LogTrackerContextStorageTypeEnum.ASPNET_HTTPCONTEXT);
+                    LogTrackerContext.Create("TEMP", LogTrackerContextStorageTypeEnum.ASPNET_HTTPCONTEXT);
                     _log.Info("request_id and request_start_time_utc created.");
                 }
+
+
                 //_log.Info(string.Format(
                 //    "Before call (request_id: {0}, request_start_time_utc: {1}, request_execute_time_ms: {2})",
                 //    LogTrackerContext.Current.RequestId,
