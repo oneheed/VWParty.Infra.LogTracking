@@ -49,14 +49,11 @@ namespace VWParty.Infra.LogTracking
                 //    LogTrackerContext.Current.RequestExecutingTime.TotalMilliseconds));
                 _logger.Info(new LogMessage()
                 {
-                    RequestId = LogTrackerContext.Current.RequestId,
                     Message = "Before call " + actionContext.ActionDescriptor.ControllerDescriptor.ControllerName + "/" +
                               actionContext.ActionDescriptor.ActionName,
                     ExtraData = new Dictionary<string, object>()
                     {
-                        { "url", actionContext.Request.RequestUri.AbsoluteUri },
-                        { "request_start_time_utc", LogTrackerContext.Current.RequestStartTimeUTC_Text },
-                        { "request_execute_time_ms", LogTrackerContext.Current.RequestExecutingTime.TotalMilliseconds.ToString("000000.000") }
+                        { "url", actionContext.Request.RequestUri.AbsoluteUri }
                     }
                 });
             }
@@ -79,14 +76,11 @@ namespace VWParty.Infra.LogTracking
                 //    LogTrackerContext.Current.RequestExecutingTime.TotalMilliseconds));
                 _logger.Info(new LogMessage()
                 {
-                    RequestId = LogTrackerContext.Current.RequestId,
                     Message = "After call " + actionExecutedContext.ActionContext.ControllerContext.ControllerDescriptor.ControllerName + "/" +
                               actionExecutedContext.ActionContext.ActionDescriptor.ActionName,
                     ExtraData = new Dictionary<string, object>()
                     {
-                        { "url", actionExecutedContext.Request.RequestUri.AbsoluteUri },
-                        { "request_start_time_utc", LogTrackerContext.Current.RequestStartTimeUTC_Text },
-                        { "request_execute_time_ms", LogTrackerContext.Current.RequestExecutingTime.TotalMilliseconds.ToString("000000.000") }
+                        { "url", actionExecutedContext.Request.RequestUri.AbsoluteUri }
                     }
                 });
                 actionExecutedContext.Response.Headers.Add(
