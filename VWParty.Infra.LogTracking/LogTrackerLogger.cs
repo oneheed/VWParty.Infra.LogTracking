@@ -11,10 +11,17 @@ namespace VWParty.Infra.LogTracking
     public class LogTrackerLogger : ILogTrackerLogger
     {
         private readonly ILogger _logger;
+        private LogTrackerContext logContext { get; set; }
 
         public LogTrackerLogger(ILogger logger)
         {
             _logger = logger;
+            logContext = LogTrackerContext.Current;
+        }
+        public LogTrackerLogger(ILogger logger, LogTrackerContext logCtx)
+        {
+            _logger = logger;
+            logContext = logCtx;
         }
         [Obsolete]
         public LogTrackerLogger(string configPath)
@@ -25,33 +32,33 @@ namespace VWParty.Infra.LogTracking
         {
             get { return _logger; }
         }
-        private static void SetValues(LogMessage item, LogBuilder builder)
+        private void SetValues(LogMessage item, LogBuilder builder)
         {
             if (!string.IsNullOrWhiteSpace(item.RequestId))
             {
                 builder.Property("request_id", item.RequestId);
             }
-            else if (item.logContext != null && !string.IsNullOrWhiteSpace(item.logContext.RequestId))
+            else if (logContext != null && !string.IsNullOrWhiteSpace(logContext.RequestId))
             {
-                builder.Property("request_id", item.logContext.RequestId);
+                builder.Property("request_id", logContext.RequestId);
             }
             else if (LogTrackerContext.Current != null && !string.IsNullOrWhiteSpace(LogTrackerContext.Current.RequestId))
             {
                 builder.Property("request_id", LogTrackerContext.Current.RequestId);
             }
 
-            if (item.logContext != null)
+            if (logContext != null)
             {
-                builder.Property("request_start_time_utc", item.logContext.RequestStartTimeUTC_Text);
+                builder.Property("request_start_time_utc", logContext.RequestStartTimeUTC_Text);
             }
             else if (LogTrackerContext.Current != null && !string.IsNullOrWhiteSpace(LogTrackerContext.Current.RequestId))
             {
                 builder.Property("request_start_time_utc", LogTrackerContext.Current.RequestStartTimeUTC_Text);
             }
 
-            if (item.logContext != null)
+            if (logContext != null)
             {
-                builder.Property("request_execute_time_ms", item.logContext.RequestExecutingTime_Text);
+                builder.Property("request_execute_time_ms", logContext.RequestExecutingTime_Text);
             }
 
             if (!string.IsNullOrWhiteSpace(item.ShortMessage))

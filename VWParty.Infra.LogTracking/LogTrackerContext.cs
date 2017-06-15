@@ -129,14 +129,16 @@ namespace VWParty.Infra.LogTracking
             get
             {
                 HttpContext _context = null;
-
+                HttpRequest _request = null;
                 try
                 {
                     _context = HttpContext.Current;
+                    _request = HttpContext.Current.Request;
                 }
-                catch(System.Web.HttpException)
+                catch(Exception ex)
                 {
                     // in app_start or app_end event handler
+                    if(ex is System.Web.HttpException || ex is System.TypeInitializationException)
                     return null;
                 }
 

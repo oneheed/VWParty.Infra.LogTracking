@@ -13,8 +13,9 @@ namespace VWParty.Infra.LogTracking
             CustomFields = new Dictionary<string, string>();
             ExtraData = new Dictionary<string, object>();
         }
-        public LogTrackerContext logContext { get; set;}
+        [Obsolete]
         public string RequestId { get; set; }
+        [Obsolete]
         public string RequestStartTimeUTC { get; set; }
         public string ShortMessage { get; set; }
         public string Message { get; set; }
