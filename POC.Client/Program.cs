@@ -13,6 +13,7 @@ namespace POC.Client
         static void Main(string[] args)
         {
             HttpClient client = new HttpClient(new LogTrackerHandler());
+            //HttpClient client = new HttpClient();
             client.BaseAddress = new Uri("http://localhost:31554/");
 
             Console.WriteLine(client.GetAsync("/api/values/123").Result);

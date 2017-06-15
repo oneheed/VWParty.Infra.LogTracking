@@ -15,10 +15,11 @@ namespace VWParty.Infra.LogTracking
         {
             this._context = LogTrackerContext.Current;
 
+            //
             if (this._context == null)
             {
                 // prefix: HC (HttpClient)
-                this._context = LogTrackerContext.Create("HC", LogTrackerContextStorageTypeEnum.NONE);
+                this._context = LogTrackerContext.Create("TEMP-HC", LogTrackerContextStorageTypeEnum.NONE);
             }
         }
 

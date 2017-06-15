@@ -56,6 +56,7 @@ namespace VWParty.Infra.LogTracking
             return Init(
                 LogTrackerContextStorageTypeEnum.NONE,
                 string.Format("{0}-{1:N}", prefix, Guid.NewGuid()).ToUpper(),
+                //string.Format("{0}-{1}", prefix, Guid.NewGuid()),
                 DateTime.UtcNow);
         }
 
@@ -133,13 +134,22 @@ namespace VWParty.Infra.LogTracking
             {
                 case LogTrackerContextStorageTypeEnum.ASPNET_HTTPCONTEXT:
 
-                    HttpContext.Current.Request.Headers.Add(
-                        _KEY_REQUEST_ID,
-                        requestId);
+                    HttpContext.Current.Request.Headers[_KEY_REQUEST_ID] = requestId;
 
-                    HttpContext.Current.Request.Headers.Add(
-                        _KEY_REQUEST_START_UTCTIME,
-                        requestStartTimeUTC.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'"));
+
+                    //HttpContext.Current.Request.Headers.Set(
+                    //    _KEY_REQUEST_ID,
+                    //    requestId);
+
+                    //HttpContext.Current.Request.Headers["X-123"] = "Y-456";
+
+
+
+                    HttpContext.Current.Request.Headers[_KEY_REQUEST_START_UTCTIME] = requestStartTimeUTC.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
+
+                    //HttpContext.Current.Request.Headers.Set(
+                    //    _KEY_REQUEST_START_UTCTIME,
+                    //    requestStartTimeUTC.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'"));
 
                     return Current;
 

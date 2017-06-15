@@ -10,7 +10,7 @@ using VWParty.Infra.LogTracking;
 
 namespace POC.WebAPI1.Controllers
 {
-    [LogTracker]
+    [LogTracker(Prefix = "ANDREW")]
     public class ValuesController : ApiController
     {
         private static Logger _log = LogManager.GetCurrentClassLogger();

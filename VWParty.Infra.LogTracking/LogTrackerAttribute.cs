@@ -12,6 +12,9 @@ namespace VWParty.Infra.LogTracking
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
     public class LogTrackerAttribute : ActionFilterAttribute
     {
+        public string Prefix { get; set; }
+
+
         private static LogTrackerLogger _logger = new LogTrackerLogger(LogManager.GetCurrentClassLogger());
 
         public override void OnActionExecuting(HttpActionContext actionContext)
@@ -25,7 +28,16 @@ namespace VWParty.Infra.LogTracking
                 if (LogTrackerContext.Current == null)
                 {
                     _log.Info("creating request_id and request_start_time_utc.");
-                    LogTrackerContext.Create("TEMP", LogTrackerContextStorageTypeEnum.ASPNET_HTTPCONTEXT);
+                    {
+                        if (string.IsNullOrEmpty(this.Prefix))
+                        {
+                            LogTrackerContext.Create("TEMP", LogTrackerContextStorageTypeEnum.ASPNET_HTTPCONTEXT);
+                        }
+                        else
+                        {
+                            LogTrackerContext.Create(this.Prefix, LogTrackerContextStorageTypeEnum.ASPNET_HTTPCONTEXT);
+                        }
+                    }
                     _log.Info("request_id and request_start_time_utc created.");
                 }
 
