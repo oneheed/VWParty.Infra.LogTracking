@@ -11,18 +11,22 @@ namespace VWParty.Infra.LogTracking
     public class LogTrackerLogger : ILogTrackerLogger
     {
         private readonly ILogger _logger;
-        private LogTrackerContext logContext { get; set; }
+        // #1: 註解掉是因為logger初始化即給logContext，
+        // 則每次logContext.Current有變動時，會造成只取第一次初始化logger時的值
+        //private LogTrackerContext logContext { get; set; }
 
         public LogTrackerLogger(ILogger logger)
         {
             _logger = logger;
-            logContext = LogTrackerContext.Current;
+            //logContext = LogTrackerContext.Current;
         }
-        public LogTrackerLogger(ILogger logger, LogTrackerContext logCtx)
-        {
-            _logger = logger;
-            logContext = logCtx;
-        }
+        // 同#1
+        //public LogTrackerLogger(ILogger logger, LogTrackerContext logCtx)
+        //{
+        //    _logger = logger;
+        //    logContext = logCtx;
+        //}
+
         [Obsolete]
         public LogTrackerLogger(string configPath)
         {
@@ -38,28 +42,37 @@ namespace VWParty.Infra.LogTracking
             {
                 builder.Property("request_id", item.RequestId);
             }
-            else if (logContext != null && !string.IsNullOrWhiteSpace(logContext.RequestId))
-            {
-                builder.Property("request_id", logContext.RequestId);
-            }
+            // 同#1
+            //else if (logContext != null && !string.IsNullOrWhiteSpace(logContext.RequestId))
+            //{
+            //    builder.Property("request_id", logContext.RequestId);
+            //}
             else if (LogTrackerContext.Current != null && !string.IsNullOrWhiteSpace(LogTrackerContext.Current.RequestId))
             {
                 builder.Property("request_id", LogTrackerContext.Current.RequestId);
             }
 
-            if (logContext != null)
-            {
-                builder.Property("request_start_time_utc", logContext.RequestStartTimeUTC_Text);
-            }
-            else if (LogTrackerContext.Current != null && !string.IsNullOrWhiteSpace(LogTrackerContext.Current.RequestId))
+            // 同#1
+            //if (logContext != null)
+            //{
+            //    builder.Property("request_start_time_utc", logContext.RequestStartTimeUTC_Text);
+            //}
+            //else 
+            if (LogTrackerContext.Current != null && !string.IsNullOrWhiteSpace(LogTrackerContext.Current.RequestId))
             {
                 builder.Property("request_start_time_utc", LogTrackerContext.Current.RequestStartTimeUTC_Text);
             }
 
-            if (logContext != null)
+            // 同#1
+            //if (logContext != null)
+            //{
+            //    builder.Property("request_execute_time_ms", logContext.RequestExecutingTime_Text);
+            //} else 
+            if (LogTrackerContext.Current != null)
             {
-                builder.Property("request_execute_time_ms", logContext.RequestExecutingTime_Text);
+                builder.Property("request_execute_time_ms", LogTrackerContext.Current.RequestExecutingTime_Text);
             }
+
 
             if (!string.IsNullOrWhiteSpace(item.ShortMessage))
             {

@@ -21,14 +21,14 @@ namespace POC.Client
             loggerWOCtxGL.Info(new LogMessage() { Message = "This log has no context information from POC.Client" });
             Console.ReadLine();
 
-            // Logger WITH explicit logConttext - To Gray Log
-            string request_id = Guid.NewGuid().ToString();
-            DateTime utcNow = DateTime.UtcNow;
-            LogTrackerContext lgc = LogTrackerContext.Init(LogTrackerContextStorageTypeEnum.NONE, request_id, utcNow);
-            Console.WriteLine("Logger WITH explicit logConttext - To Gray Log");
-            LogTrackerLogger loggerWTHCtxGL = new LogTrackerLogger(LogManager.GetLogger("ToGrayLog"), lgc);
-            loggerWTHCtxGL.Info(new LogMessage() { Message = "This log has context information from POC.Client" });
-            Console.ReadLine();
+            //// Logger WITH explicit logConttext - To Gray Log
+            //string request_id = Guid.NewGuid().ToString();
+            //DateTime utcNow = DateTime.UtcNow;
+            //LogTrackerContext lgc = LogTrackerContext.Init(LogTrackerContextStorageTypeEnum.NONE, request_id, utcNow);
+            //Console.WriteLine("Logger WITH explicit logConttext - To Gray Log");
+            //LogTrackerLogger loggerWTHCtxGL = new LogTrackerLogger(LogManager.GetLogger("ToGrayLog"), lgc);
+            //loggerWTHCtxGL.Info(new LogMessage() { Message = "This log has context information from POC.Client" });
+            //Console.ReadLine();
 
             LogTrackerContext.Clean();
             HttpClient client = new HttpClient(new LogTrackerHandler());
