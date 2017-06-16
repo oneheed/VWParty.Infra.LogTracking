@@ -30,8 +30,64 @@ namespace VWParty.Infra.LogTracking
         public const string _KEY_REQUEST_START_UTCTIME = "X-REQUEST-START-UTCTIME";
 
 
+        [Obsolete("請提供明確的 request-id prefix")]
+        public static LogTrackerContext Create()
+        {
+            return Init(
+                LogTrackerContextStorageTypeEnum.NONE,
+                Guid.NewGuid().ToString(),
+                DateTime.UtcNow);
+        }
 
-        public static LogTrackerContext Init(LogTrackerContextStorageTypeEnum type) 
+        /// <summary>
+        /// 建立 LogTrackerContext. 會產生一組新的 Request-ID 與 Request-Start-UTCTime, 用來識別與追蹤這一串任務的相關日誌。
+        /// 不指定 Storage Type 的情況下，這個 LogTrackerContext 將不會儲存在任何環境下，呼叫端必須明確地將這個物件傳遞下去。
+        /// </summary>
+        /// <remarks>
+        /// Prefix 列表:
+        /// - HC:   HttpClient
+        /// - GW:   API Gateway
+        /// - TEMP: 暫時使用 (ASP.NET MVC Filter)
+        /// </remarks>
+        /// <param name="prefix"></param>
+        /// <returns></returns>
+        public static LogTrackerContext Create(string prefix)
+        {
+            return Init(
+                LogTrackerContextStorageTypeEnum.NONE,
+                string.Format("{0}-{1:N}", prefix, Guid.NewGuid()).ToUpper(),
+                //string.Format("{0}-{1}", prefix, Guid.NewGuid()),
+                DateTime.UtcNow);
+        }
+
+        [Obsolete("請提供明確的 request-id prefix")]
+        public static LogTrackerContext Create(LogTrackerContextStorageTypeEnum type)
+        {
+            return Init(
+                type,
+                Guid.NewGuid().ToString(),
+                DateTime.UtcNow);
+        }
+
+        /// <summary>
+        /// 建立 LogTrackerContext. 會產生一組新的 Request-ID 與 Request-Start-UTCTime, 用來識別與追蹤這一串任務的相關日誌。
+        /// 建立好的 LogTrackerContext 關鍵資訊會自動儲存在指定的 Storage, 不需要明確的傳遞下去。只要執行時還維持在同樣的
+        /// 執行環境 (context)，呼叫 LogTrackerContext.Current 即可取回先前 Create 的 Context 內容。
+        /// </summary>
+        /// <param name="prefix"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static LogTrackerContext Create(string prefix, LogTrackerContextStorageTypeEnum type)
+        {
+            return Init(
+                type,
+                string.Format("{0}-{1:N}", prefix, Guid.NewGuid()).ToUpper(),
+                DateTime.UtcNow);
+        }
+
+
+        [Obsolete("請改用 Create(), Init 只做串接 context 的內容，不再負責起始新的 context 內容 (request id / time)。", true)]
+        public static LogTrackerContext Init(LogTrackerContextStorageTypeEnum type)
         {
             return Init(
                 type,
@@ -40,14 +96,36 @@ namespace VWParty.Infra.LogTracking
         }
 
 
+        /// <summary>
+        /// 從既有的 context 物件來初始化 LogTrackerContext。
+        /// 只在串接上一關傳遞過來的 context 時使用，不會產生新的 Request-ID 跟 Request-Start-UTCTime。
+        /// 若有需要產生新的 context, 請呼叫 Create( )
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public static LogTrackerContext Init(LogTrackerContextStorageTypeEnum type, LogTrackerContext context)
         {
+            if (context == null)
+            {
+                throw new ArgumentNullException("parameter: context can not be NULL.");
+            }
+
             return Init(
                 type,
                 context.RequestId,
                 context.RequestStartTimeUTC);
         }
 
+        /// <summary>
+        /// 從既有的 context 關鍵資訊 (request-id, request-start-utctime) 來初始化 LogTrackerContext。
+        /// 只在串接上一關傳遞過來的 context 時使用，不會產生新的 Request-ID 跟 Request-Start-UTCTime。
+        /// 若有需要產生新的 context, 請呼叫 Create( )
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="requestId"></param>
+        /// <param name="requestStartTimeUTC"></param>
+        /// <returns></returns>
         public static LogTrackerContext Init(LogTrackerContextStorageTypeEnum type, string requestId, DateTime requestStartTimeUTC)
         {
             if (requestStartTimeUTC.Kind != DateTimeKind.Utc) throw new ArgumentOutOfRangeException("requestStartTimeUTC MUST be UTC time.");
@@ -56,13 +134,22 @@ namespace VWParty.Infra.LogTracking
             {
                 case LogTrackerContextStorageTypeEnum.ASPNET_HTTPCONTEXT:
 
-                    HttpContext.Current.Request.Headers.Add(
-                        _KEY_REQUEST_ID,
-                        requestId);
+                    HttpContext.Current.Request.Headers[_KEY_REQUEST_ID] = requestId;
 
-                    HttpContext.Current.Request.Headers.Add(
-                        _KEY_REQUEST_START_UTCTIME,
-                        requestStartTimeUTC.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'"));
+
+                    //HttpContext.Current.Request.Headers.Set(
+                    //    _KEY_REQUEST_ID,
+                    //    requestId);
+
+                    //HttpContext.Current.Request.Headers["X-123"] = "Y-456";
+
+
+
+                    HttpContext.Current.Request.Headers[_KEY_REQUEST_START_UTCTIME] = requestStartTimeUTC.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
+
+                    //HttpContext.Current.Request.Headers.Set(
+                    //    _KEY_REQUEST_START_UTCTIME,
+                    //    requestStartTimeUTC.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'"));
 
                     return Current;
 
@@ -90,7 +177,9 @@ namespace VWParty.Infra.LogTracking
             throw new NotSupportedException();
         }
 
-
+        /// <summary>
+        /// 清除目前的 context 內容，清除過後 .current 就無法再取得 context 物件
+        /// </summary>
         public static void Clean()
         {
             if (LogTrackerContext.Current !=null)
@@ -99,6 +188,10 @@ namespace VWParty.Infra.LogTracking
             }
         }
 
+        /// <summary>
+        /// 清儲存在指定 storage type 的 log context 資訊
+        /// </summary>
+        /// <param name="type"></param>
         public static void Clean(LogTrackerContextStorageTypeEnum type)
         {
             switch (type)
@@ -123,20 +216,40 @@ namespace VWParty.Infra.LogTracking
         }
 
 
-
+        /// <summary>
+        /// 取得目前作用中的 log context, 會依序搜尋下列 storage:
+        /// 1. asp.net web hosting environment (http context)
+        /// 2. asp.net owin context (not implement)
+        /// 3. .net thread data slot
+        /// 若無符合的內容，則會直接 return null;
+        /// </summary>
         public static LogTrackerContext Current
         {
             get
             {
-                if (HttpContext.Current != null && string.IsNullOrEmpty(HttpContext.Current.Request.Headers.Get(_KEY_REQUEST_ID)) == false)
+                HttpContext _context = null;
+                HttpRequest _request = null;
+                try
+                {
+                    _context = HttpContext.Current;
+                    _request = HttpContext.Current.Request;
+                }
+                catch(Exception ex)
+                {
+                    // in app_start or app_end event handler
+                    if(ex is System.Web.HttpException || ex is System.TypeInitializationException)
+                    return null;
+                }
+
+                if (_context != null && string.IsNullOrEmpty(_context.Request.Headers.Get(_KEY_REQUEST_ID)) == false)
                 {
                     // match in httpcontext
                     return new LogTrackerContext()
                     {
                         StorageType = LogTrackerContextStorageTypeEnum.ASPNET_HTTPCONTEXT,
-                        RequestId = HttpContext.Current.Request.Headers.Get(_KEY_REQUEST_ID),
-                        RequestStartTimeUTC = //DateTimeOffset.Parse(HttpContext.Current.Request.Headers.Get(_KEY_REQUEST_START_UTCTIME)).UtcDateTime
-                            DateTime.Parse(HttpContext.Current.Request.Headers.Get(_KEY_REQUEST_START_UTCTIME)).ToUniversalTime()
+                        RequestId = _context.Request.Headers.Get(_KEY_REQUEST_ID),
+                        RequestStartTimeUTC = //DateTimeOffset.Parse(_context.Request.Headers.Get(_KEY_REQUEST_START_UTCTIME)).UtcDateTime
+                            DateTime.Parse(_context.Request.Headers.Get(_KEY_REQUEST_START_UTCTIME)).ToUniversalTime()
                     };
                 }
                 else if (false) // TODO: check OWIN environment
@@ -162,6 +275,9 @@ namespace VWParty.Infra.LogTracking
             }
         }
 
+        /// <summary>
+        /// 儲存 log context 關鍵資訊的方式
+        /// </summary>
         public LogTrackerContextStorageTypeEnum StorageType
         {
             get;
@@ -181,51 +297,29 @@ namespace VWParty.Infra.LogTracking
         //private string _local_request_id = null;
         //private DateTime _local_request_start_utctime = DateTime.MinValue;
 
+
+        /// <summary>
+        /// Request-ID
+        /// </summary>
         public string RequestId
         {
-            //get
-            //{
-            //    switch (this.StorageType)
-            //    {
-            //        case LogTrackerContextStorageTypeEnum.ASPNET_HTTPCONTEXT:
-            //            return HttpContext.Current.Request.Headers.Get(_KEY_REQUEST_ID);
-
-            //        case LogTrackerContextStorageTypeEnum.THREAD_DATASLOT:
-            //            return _thread_static_request_id;
-
-            //        case LogTrackerContextStorageTypeEnum.NONE:
-            //            return this._local_request_id;
-
-            //    }
-            //    throw new NotSupportedException();
-            //}
-
             get;
             private set;
         }
 
+        /// <summary>
+        /// Request-Start-UTCTime
+        /// </summary>
         public DateTime RequestStartTimeUTC
         {
-            //get
-            //{
-            //    switch (this.StorageType)
-            //    {
-            //        case LogTrackerContextStorageTypeEnum.ASPNET_HTTPCONTEXT:
-            //            DateTimeOffset dto = DateTimeOffset.Parse(HttpContext.Current.Request.Headers.Get(_KEY_REQUEST_START_UTCTIME));
-            //            return dto.UtcDateTime;
-
-            //        case LogTrackerContextStorageTypeEnum.THREAD_DATASLOT:
-            //            return _thread_static_request_start_utctime;
-
-            //        case LogTrackerContextStorageTypeEnum.NONE:
-            //            return this._local_request_start_utctime;
-            //    }
-            //    throw new NotSupportedException();
-            //}
             get;
             private set;
         }
 
+        /// <summary>
+        /// 格式化的 RequestStartTimeUTC 內容
+        /// </summary>
+        //[Obsolete]
         public string RequestStartTimeUTC_Text
         {
             get
@@ -234,11 +328,27 @@ namespace VWParty.Infra.LogTracking
             }
         }
 
+
+        /// <summary>
+        /// Request-Executing-Time, 及時計算
+        /// </summary>
         public TimeSpan RequestExecutingTime
         {
             get
             {
                 return DateTime.UtcNow - this.RequestStartTimeUTC;
+            }
+        }
+
+        /// <summary>
+        /// 格式化的 RequestExecutingTime 內容
+        /// </summary>
+        //[Obsolete]
+        public string RequestExecutingTime_Text
+        {
+            get
+            {
+                return (DateTime.UtcNow - this.RequestStartTimeUTC).TotalMilliseconds.ToString("000000.000");
             }
         }
     }
