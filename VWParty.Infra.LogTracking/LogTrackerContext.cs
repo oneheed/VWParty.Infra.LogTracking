@@ -106,9 +106,9 @@ namespace VWParty.Infra.LogTracking
         /// <returns></returns>
         public static LogTrackerContext Init(LogTrackerContextStorageTypeEnum type, LogTrackerContext context)
         {
-            if (context == null)
+            if (LogTrackerContext.IsEmptyOrNull(context))
             {
-                throw new ArgumentNullException("parameter: context can not be NULL.");
+                throw new ArgumentNullException("parameter: context can not be NULL or EMPTY.");
             }
 
             return Init(
@@ -182,7 +182,8 @@ namespace VWParty.Infra.LogTracking
         /// </summary>
         public static void Clean()
         {
-            if (LogTrackerContext.Current !=null)
+            //if (LogTrackerContext.Current != null)
+            if (!LogTrackerContext.IsEmptyOrNull(LogTrackerContext.Current))
             {
                 Clean(LogTrackerContext.Current.StorageType);
             }
@@ -205,7 +206,8 @@ namespace VWParty.Infra.LogTracking
                 case LogTrackerContextStorageTypeEnum.THREAD_DATASLOT:
                     _thread_static_is_set = false;
                     _thread_static_request_id = null;
-                    _thread_static_request_start_utctime = DateTime.MinValue;
+                    //_thread_static_request_start_utctime = DateTime.MinValue;
+                    _thread_static_request_start_utctime = DateTime.Parse("0001-01-01T00:00:00.000Z").ToUniversalTime();
                     break;
 
                 case LogTrackerContextStorageTypeEnum.OWIN_CONTEXT:
@@ -215,6 +217,35 @@ namespace VWParty.Infra.LogTracking
             }
         }
 
+        /// <summary>
+        /// 空白log context
+        /// 1. RequestId = String.Empty
+        /// 2. RequestStartTimeUTC = DateTime.Parse("0001-01-01T00:00:00.000Z").ToUniversalTime()
+        /// </summary>
+        public static LogTrackerContext Empty
+        {
+            get
+            {
+                DateTime utcMin = DateTime.Parse("0001-01-01T00:00:00.000Z").ToUniversalTime();
+                return LogTrackerContext.Init(LogTrackerContextStorageTypeEnum.NONE, String.Empty, utcMin);
+            }
+        }
+
+        /// <summary>
+        /// 檢查是否為空白log context
+        /// </summary>
+        public static bool IsEmptyOrNull(LogTrackerContext logContext)
+        {
+            bool isEmptyOrNull = false;
+            DateTime utcMinValue = DateTime.Parse("0001-01-01T00:00:00.000Z").ToUniversalTime();
+            if (logContext == null || String.IsNullOrEmpty(logContext.RequestId) ||
+                logContext.RequestStartTimeUTC == utcMinValue || logContext.RequestStartTimeUTC == DateTime.MinValue)
+            {
+                isEmptyOrNull = true;
+            }
+
+            return isEmptyOrNull;
+        }
 
         /// <summary>
         /// 取得目前作用中的 log context, 會依序搜尋下列 storage:
@@ -238,7 +269,7 @@ namespace VWParty.Infra.LogTracking
                 {
                     // in app_start or app_end event handler
                     if(ex is System.Web.HttpException || ex is System.TypeInitializationException)
-                    return null;
+                    return LogTrackerContext.Empty;
                 }
 
                 if (_context != null && string.IsNullOrEmpty(_context.Request.Headers.Get(_KEY_REQUEST_ID)) == false)
@@ -258,7 +289,8 @@ namespace VWParty.Infra.LogTracking
                     {
                         StorageType = LogTrackerContextStorageTypeEnum.OWIN_CONTEXT,
                         RequestId = null,
-                        RequestStartTimeUTC = DateTime.MinValue
+                        //RequestStartTimeUTC = DateTime.MinValue
+                        RequestStartTimeUTC = DateTime.Parse("0001-01-01T00:00:00.000Z").ToUniversalTime()
                     };
                 }
                 else if (_thread_static_is_set == true) // check thread environment
@@ -271,7 +303,7 @@ namespace VWParty.Infra.LogTracking
                     };
                 }
 
-                return null;
+                return LogTrackerContext.Empty;
             }
         }
 
@@ -292,7 +324,8 @@ namespace VWParty.Infra.LogTracking
         private static string _thread_static_request_id = null;
 
         [ThreadStatic]
-        private static DateTime _thread_static_request_start_utctime = DateTime.MinValue;
+//        private static DateTime _thread_static_request_start_utctime = DateTime.MinValue;
+        private static DateTime _thread_static_request_start_utctime = DateTime.Parse("0001-01-01T00:00:00.000Z").ToUniversalTime();
 
         //private string _local_request_id = null;
         //private DateTime _local_request_start_utctime = DateTime.MinValue;
@@ -324,7 +357,14 @@ namespace VWParty.Infra.LogTracking
         {
             get
             {
-                return this.RequestStartTimeUTC.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
+                if (LogTrackerContext.IsEmptyOrNull(this))
+                {
+                    return String.Empty;
+                }
+                else
+                {
+                    return this.RequestStartTimeUTC.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
+                }
             }
         }
 
@@ -348,7 +388,14 @@ namespace VWParty.Infra.LogTracking
         {
             get
             {
-                return (DateTime.UtcNow - this.RequestStartTimeUTC).TotalMilliseconds.ToString("000000.000");
+                if (LogTrackerContext.IsEmptyOrNull(this))
+                {
+                    return String.Empty;
+                }
+                else
+                {
+                    return (DateTime.UtcNow - this.RequestStartTimeUTC).TotalMilliseconds.ToString("000000.000");
+                }
             }
         }
     }
