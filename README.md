@@ -30,8 +30,17 @@ install-package VWParty.Infra.LogTracking -pre
 - POC.Client
 - POC.WebAPI1
 - POC.WebAPI2
+
+> POC 範例說明，Demo 由 Client 發動 Http Request , 呼叫 WebAPI1 提供的 REST API
+> WebAPI1 接到 request 後，再轉發 Http Request 給 WebAPI2。
+> 藉著這樣一連串呼叫的過程，展示 LogTrackerContext 的運作方式
+
 - VWParty.Infra.LogTracking
+> SDK 專案本身
+
 - VWParty.Infra.LogTracking.Tests
+> SDK 的單元測試
+
 
 
 # VWParty.Infra.LogTracking SDK 使用說明
@@ -49,54 +58,86 @@ install-package VWParty.Infra.LogTracking -pre
 
 ## LogTrackerContext
 
-```LogTrackerContext``` 是這套 SDK 的核心機制。Context 物件代表了目前 LogTracking 的關鍵資訊 (目前實作的關鍵資訊有兩個:
-Request-ID 與 Request-Start-TimeUTC)。只要能正確掌握 LogTrackerContext, 所有的 Log 機制就能正確的輸出 Log, 事後就能正確的
+```LogTrackerContext``` 是這套 SDK 的核心機制。```LogTrackerContext``` 物件代表了目前 Log Tracking 的關鍵資訊 (目前實作的關鍵資訊有兩個:
+Request-ID 與 Request-Start-TimeUTC)。只要能正確掌握 ```LogTrackerContext```, 所有的 Log 機制就能正確的輸出 Log, 事後就能正確的
 還原某個任務在所有的服務中處理的詳細記錄。
 
-LogTrackerContext 只能透過 .Create() 方法來建立。建立的動作會產生一筆新的 unique id 作為 Request-ID, 也會把目前的時間 (UTC)
+```LogTrackerContext``` 只能透過 ```LogTrackerContext.Create()``` 方法來建立。建立的動作會產生一筆新的 unique id 作為 Request-ID, 也會把目前的時間 (UTC)
 一起記錄下來，方便將來用任務啟動那瞬間的相對時間來追查訊息。
 
-LogTrackerContext 建立 (Create) 後，開發者必須視情況決定如何把它保存下來，讓其他 code 能明確地找到? 這些保存的方式定義再
-StorageTypeEnum, 目前有定義的儲存方式有:
+```LogTrackerContext``` 建立 (```Create```) 後，開發者必須視情況決定如何把它保存下來，讓其他 code 能明確地找到? 這些保存的方式定義在
+```LogTrackerContextStorageTypeEnum```, 目前有定義的儲存方式有:
 
-- NONE, 不儲存，由開發人員自行保留與傳遞
-- HttpContext, 儲存在 HttpContext 的 Request Header 內, 只限 ASP.NET 應用程式內使用。只要在同一個 Http Request 的 pipeline 內都能存取。
-- OwinContext, 儲存在 OwinContext 的 Request 內 (目前尚未實作)
-- ThreadDataSlot, 儲存在目前的 thread 專屬儲存空間內。只要在同一個 thread 以下都能夠存取。若程式執行會跨越不同 threads, 則必須手動串接轉移
+```csharp
+    public enum LogTrackerContextStorageTypeEnum : int
+    {
+        ASPNET_HTTPCONTEXT,
+        OWIN_CONTEXT,   // not supported
+        THREAD_DATASLOT,
+        NONE
+    }
+```
+- ```NONE```, 不儲存，由開發人員自行保留與傳遞
+- ```ASPNET_HTTPCONTEXT```, 儲存在 ```HttpContext``` 的 Request Header 內, 只限 ASP.NET 應用程式內使用。只要在同一個 Http Request 的 pipeline 內都能存取。
+- ```OWIN_CONTEXT```, 儲存在 ```OwinContext``` 的 Request 內 (目前尚未實作)
+- ```THREAD_DATASLOT```, 儲存在目前的 thread 專屬儲存空間內。只要在同一個 thread 以下都能夠存取。若程式執行會跨越不同 threads, 則必須手動串接轉移
 
-跨越不同的 Context, 則必須明確的轉移目前的 LogTrackerContext. 如果你想串接前面關卡傳遞過來的 LogTrackerContext, 請用 Init() 來承接
+跨越不同的 Context, 則必須明確的轉移目前的 ```LogTrackerContext```. 如果你想串接前面關卡傳遞過來的 ```LogTrackerContext```, 請用 ```LogTrackerContext.Init()``` 來承接
 前面的 Context, 並且把它儲存在合適的 Storage 內。
 
 
 實際應用的狀況下，主要就是考慮兩件事情:
-1. 何時要產生 Context ?
-2. 要如何串接 Context ?
+1. 何時要產生 ```LogTrackerContext``` ?
+2. 要如何串接 ```LogTrackerContext``` ?
 
 以下分別說明這兩個動作:
 
 ### 何時產生 Context ?
 
-目前整套機制，有幾個適合產生 Context 的時機:
+目前整套機制，有幾個適合產生 ```LogTrackerContext``` 的時機:
 
 1. 經過 API Gateway 時自動建立 (已完成)
-只要是透過 API Gateway 轉送的 API Call, 都會自動在 Header 內存放 Create 後的 Context 關鍵資訊。
-2. WebAPI 套用 LogTrackerAttribute, 效用如同 API Gateway, 經過 Controller 就會自動建立
-3. 其他，由開發者自行呼叫 .Create( ) 建立
+只要是透過 API Gateway 轉送的 API Call, 都會自動在 Header 內存放 ```LogTrackerContext``` 關鍵資訊。
+2. WebAPI 套用 ```LogTrackerAttribute```, 效用如同 API Gateway, 經過 ```Controller``` 就會自動建立
+3. 其他，由開發者自行呼叫 ```LogTrackerContext.Create()``` 建立
 
 
 傳遞的機制，目前 SDK 也準備了幾個常用的管道，利於統一處理:
 
-1. HttpClient Handler - 若你透過 HttpClient 呼叫 WebAPI, 透過 HttpClient Handler 就能自動地把目前 Context 透過 Request Headers 轉送到下一關。
-2. ASP.NET MVC Filter - 若前端已經透過 Request Header 傳遞 Context, 則只要標記 Filter Attribute, 就能自動承接來自 Request Headers 的 Context, 若無則會自己產生一組。並且再 API 呼叫的前後分別寫下一筆 Log
-(註: 你不需要透過 Filter, 也能透過 Context.Current 取得上一關傳遞過來的 Context)
+1. HttpClient Handler - 若你透過 ```HttpClient``` 呼叫 WebAPI, 透過 HttpClient Handler 就能自動地把目前 ```LogTrackerContext``` 透過 Request Headers 轉送到下一關。
+2. ASP.NET MVC Filter - 若前端已經透過 Request Header 傳遞 ```LogTrackerContext```, 則只要標記 Filter Attribute, 就能自動承接來自 Request Headers 的 ```LogTrackerContext```, 若無則會自己產生一組。並且再 API 呼叫的前後分別寫下一筆 Log
+(註: 你不需要透過 Filter, 也能透過 ```LogTrackerContext.Current``` 取得上一關傳遞過來的 ```LogTrackerContext```)
 
-為了方便在日誌裡面標示 Context 的資訊，SDK 也做了下列整合與處理:
+為了方便在日誌裡面標示 ```LogTrackerContext``` 的資訊，SDK 也做了下列整合與處理:
 
 1. 結合既有的 Mnemosyne Logger, 透過 Logger 輸出到 GrayLog 的紀錄，都會自動附加目前環境的 request-id, request-start-time, request-execute-time
-2. 若要透過 NLog 輸出，則 SDK 也提供了 renderer: ${...}
+2. 若要透過 NLog 輸出，則 SDK 也提供了 renderer: ${vwparty-request-id} 等。例如:
+```xml
+    <variable name="Layout" value="${longdate} (${vwparty-request-id},${vwparty-request-time},${vwparty-request-execute}) | ${message} ${newline}"/>
+```
 
 
 
-# 範例
+# 範例 (core)
 
-(USAGE)
+
+## Create() - 建立一組新的 LogTrackerContext (要追蹤事件的起始點)
+
+
+## Init() - 跨越環境時，要承接前一個環境傳遞過來的 LogTrackerContext
+
+
+## 取用目前的 LogTrackerContext
+
+
+
+# 範例 (helper)
+
+## HttpClient Handler
+
+## ASP.NET MVC Filter
+
+## NLog Extension
+
+## GrayLog Logger
+
