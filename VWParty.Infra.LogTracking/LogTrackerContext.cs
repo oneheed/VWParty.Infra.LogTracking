@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using NLog;
 
 namespace VWParty.Infra.LogTracking
 {
@@ -108,7 +109,7 @@ namespace VWParty.Infra.LogTracking
         {
             if (context == null)
             {
-                throw new ArgumentNullException("parameter: context can not be NULL.");
+                throw new ArgumentNullException("parameter: context can not be NULL or EMPTY.");
             }
 
             return Init(
@@ -128,28 +129,21 @@ namespace VWParty.Infra.LogTracking
         /// <returns></returns>
         public static LogTrackerContext Init(LogTrackerContextStorageTypeEnum type, string requestId, DateTime requestStartTimeUTC)
         {
-            if (requestStartTimeUTC.Kind != DateTimeKind.Utc) throw new ArgumentOutOfRangeException("requestStartTimeUTC MUST be UTC time.");
+            if (String.IsNullOrEmpty(requestId) || String.IsNullOrWhiteSpace(requestId))
+            {
+                throw new ArgumentOutOfRangeException("requestId MUST NOT be null or empty or white space only.");
+            }
+            if (requestStartTimeUTC.Kind != DateTimeKind.Utc)
+            {
+                throw new ArgumentOutOfRangeException("requestStartTimeUTC MUST be UTC time.");
+            }
 
             switch (type)
             {
                 case LogTrackerContextStorageTypeEnum.ASPNET_HTTPCONTEXT:
 
                     HttpContext.Current.Request.Headers[_KEY_REQUEST_ID] = requestId;
-
-
-                    //HttpContext.Current.Request.Headers.Set(
-                    //    _KEY_REQUEST_ID,
-                    //    requestId);
-
-                    //HttpContext.Current.Request.Headers["X-123"] = "Y-456";
-
-
-
                     HttpContext.Current.Request.Headers[_KEY_REQUEST_START_UTCTIME] = requestStartTimeUTC.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
-
-                    //HttpContext.Current.Request.Headers.Set(
-                    //    _KEY_REQUEST_START_UTCTIME,
-                    //    requestStartTimeUTC.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'"));
 
                     return Current;
 
@@ -182,7 +176,8 @@ namespace VWParty.Infra.LogTracking
         /// </summary>
         public static void Clean()
         {
-            if (LogTrackerContext.Current !=null)
+            //if (LogTrackerContext.Current != null)
+            if (LogTrackerContext.Current != null)
             {
                 Clean(LogTrackerContext.Current.StorageType);
             }
@@ -206,6 +201,7 @@ namespace VWParty.Infra.LogTracking
                     _thread_static_is_set = false;
                     _thread_static_request_id = null;
                     _thread_static_request_start_utctime = DateTime.MinValue;
+                    //_thread_static_request_start_utctime = DateTime.Parse("0001-01-01T00:00:00.000Z").ToUniversalTime();
                     break;
 
                 case LogTrackerContextStorageTypeEnum.OWIN_CONTEXT:
@@ -215,13 +211,13 @@ namespace VWParty.Infra.LogTracking
             }
         }
 
-
         /// <summary>
         /// 取得目前作用中的 log context, 會依序搜尋下列 storage:
         /// 1. asp.net web hosting environment (http context)
         /// 2. asp.net owin context (not implement)
         /// 3. .net thread data slot
         /// 若無符合的內容，則會直接 return null;
+        /// Exception: ArgumentNullException, FormatException
         /// </summary>
         public static LogTrackerContext Current
         {
@@ -243,14 +239,33 @@ namespace VWParty.Infra.LogTracking
 
                 if (_context != null && string.IsNullOrEmpty(_context.Request.Headers.Get(_KEY_REQUEST_ID)) == false)
                 {
-                    // match in httpcontext
-                    return new LogTrackerContext()
+                    // RequestStartTimeUTC Parse過程可能發生Exception: DateTime格式不合(ArgumentNullException, FormatException)
+                    // Production環境回傳null，Develop環境則直接丟Exception
+                    try
                     {
-                        StorageType = LogTrackerContextStorageTypeEnum.ASPNET_HTTPCONTEXT,
-                        RequestId = _context.Request.Headers.Get(_KEY_REQUEST_ID),
-                        RequestStartTimeUTC = //DateTimeOffset.Parse(_context.Request.Headers.Get(_KEY_REQUEST_START_UTCTIME)).UtcDateTime
-                            DateTime.Parse(_context.Request.Headers.Get(_KEY_REQUEST_START_UTCTIME)).ToUniversalTime()
-                    };
+                        return new LogTrackerContext()
+                        {
+                            StorageType = LogTrackerContextStorageTypeEnum.ASPNET_HTTPCONTEXT,
+                            RequestId = _context.Request.Headers.Get(_KEY_REQUEST_ID),
+                            RequestStartTimeUTC = DateTime.Parse(_context.Request.Headers.Get(_KEY_REQUEST_START_UTCTIME)).ToUniversalTime()
+                        };
+                    }
+                    catch(ArgumentNullException ex)
+                    {
+#if DEBUG
+                        throw ex;
+#endif
+                        LogManager.GetCurrentClassLogger().Debug(String.Format("LogTrackerContext.Current Exception: {0}", ex.Message));
+                        return null;
+                    }
+                    catch(FormatException ex)
+                    {
+#if DEBUG
+                        throw ex;
+#endif
+                        LogManager.GetCurrentClassLogger().Debug(String.Format("LogTrackerContext.Current Exception: {0}", ex.Message));
+                        return null;
+                    }
                 }
                 else if (false) // TODO: check OWIN environment
                 {
@@ -259,6 +274,7 @@ namespace VWParty.Infra.LogTracking
                         StorageType = LogTrackerContextStorageTypeEnum.OWIN_CONTEXT,
                         RequestId = null,
                         RequestStartTimeUTC = DateTime.MinValue
+                        //RequestStartTimeUTC = DateTime.Parse("0001-01-01T00:00:00.000Z").ToUniversalTime()
                     };
                 }
                 else if (_thread_static_is_set == true) // check thread environment
@@ -293,6 +309,7 @@ namespace VWParty.Infra.LogTracking
 
         [ThreadStatic]
         private static DateTime _thread_static_request_start_utctime = DateTime.MinValue;
+        //private static DateTime _thread_static_request_start_utctime = DateTime.Parse("0001-01-01T00:00:00.000Z").ToUniversalTime();
 
         //private string _local_request_id = null;
         //private DateTime _local_request_start_utctime = DateTime.MinValue;
