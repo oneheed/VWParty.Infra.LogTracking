@@ -376,7 +376,14 @@ namespace VWParty.Infra.LogTracking
         {
             get
             {
-                return DateTime.UtcNow - this.RequestStartTimeUTC;
+                if (LogTrackerContext.IsEmptyOrNull(this))
+                {
+                    return TimeSpan.MinValue;
+                }
+                else
+                {
+                    return DateTime.UtcNow - this.RequestStartTimeUTC;
+                }
             }
         }
 
