@@ -13,7 +13,7 @@ namespace VWParty.Infra.LogTracking
     {
         protected override void Append(StringBuilder builder, LogEventInfo logEvent)
         {
-            if (!LogTrackerContext.IsEmptyOrNull(LogTrackerContext.Current))
+            if (LogTrackerContext.Current != null)
             {
                 builder.Append(LogTrackerContext.Current.RequestId);
             }
@@ -25,7 +25,7 @@ namespace VWParty.Infra.LogTracking
     {
         protected override void Append(StringBuilder builder, LogEventInfo logEvent)
         {
-            if (!LogTrackerContext.IsEmptyOrNull(LogTrackerContext.Current))
+            if (LogTrackerContext.Current != null)
             {
                 builder.Append(LogTrackerContext.Current.RequestStartTimeUTC);
             }
@@ -37,7 +37,7 @@ namespace VWParty.Infra.LogTracking
     {
         protected override void Append(StringBuilder builder, LogEventInfo logEvent)
         {
-            if (!LogTrackerContext.IsEmptyOrNull(LogTrackerContext.Current))
+            if (LogTrackerContext.Current != null)
             {
                 builder.Append(LogTrackerContext.Current.RequestExecutingTime);
             }

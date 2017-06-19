@@ -47,7 +47,7 @@ namespace VWParty.Infra.LogTracking
             //{
             //    builder.Property("request_id", logContext.RequestId);
             //}
-            else if (!LogTrackerContext.IsEmptyOrNull(LogTrackerContext.Current))
+            else if (LogTrackerContext.Current != null)
             {
                 builder.Property("request_id", LogTrackerContext.Current.RequestId);
             }
@@ -58,7 +58,7 @@ namespace VWParty.Infra.LogTracking
             //    builder.Property("request_start_time_utc", logContext.RequestStartTimeUTC_Text);
             //}
             //else 
-            if (!LogTrackerContext.IsEmptyOrNull(LogTrackerContext.Current))
+            if (LogTrackerContext.Current != null)
             {
                 builder.Property("request_start_time_utc", LogTrackerContext.Current.RequestStartTimeUTC_Text);
             }
@@ -68,7 +68,7 @@ namespace VWParty.Infra.LogTracking
             //{
             //    builder.Property("request_execute_time_ms", logContext.RequestExecutingTime_Text);
             //} else 
-            if (!LogTrackerContext.IsEmptyOrNull(LogTrackerContext.Current))
+            if (LogTrackerContext.Current != null)
             {
                 builder.Property("request_execute_time_ms", LogTrackerContext.Current.RequestExecutingTime_Text);
             }
