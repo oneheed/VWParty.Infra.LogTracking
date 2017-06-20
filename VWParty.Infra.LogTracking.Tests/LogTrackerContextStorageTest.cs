@@ -15,8 +15,27 @@ namespace VWParty.Infra.LogTracking.Tests
             set;
         }
 
+
+
         [TestMethod]
-        public void Test_ThreadDataSlotStorage()
+        public void Test_BasicThreadDataSlotStorage()
+        {
+            var context = LogTrackerContext.Create("UNITTEST", LogTrackerContextStorageTypeEnum.THREAD_DATASLOT);
+            Assert.AreEqual(
+                context.RequestId,
+                LogTrackerContext.Current.RequestId);
+            Assert.AreEqual(
+                context.RequestStartTimeUTC,
+                LogTrackerContext.Current.RequestStartTimeUTC);
+        }
+
+
+
+
+
+
+        [TestMethod]
+        public void Test_ThreadDataSlotStorage_MultiThreads()
         {
             List<Task> tasks = new List<Task>();
             for(int i = 0; i < 10; i++)
