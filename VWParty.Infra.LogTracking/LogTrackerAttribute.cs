@@ -25,7 +25,7 @@ namespace VWParty.Infra.LogTracking
                 //
                 // TODO: 後續版本必須移除。LogTrackerContext 不應該 "全自動" 的產生，必須有明確進入點才能建立新的 LogTrackerContext.
                 //
-                if (LogTrackerContext.IsEmptyOrNull(LogTrackerContext.Current))
+                if (LogTrackerContext.Current == null)
                 {
                     _log.Info("creating request_id and request_start_time_utc.");
                     {
@@ -83,7 +83,7 @@ namespace VWParty.Infra.LogTracking
                         { "url", actionExecutedContext.Request.RequestUri.AbsoluteUri }
                     }
                 });
-                if (!LogTrackerContext.IsEmptyOrNull(LogTrackerContext.Current))
+                if (LogTrackerContext.Current != null)
                 {
                     actionExecutedContext.Response.Headers.Add(
                         LogTrackerContext._KEY_REQUEST_ID,

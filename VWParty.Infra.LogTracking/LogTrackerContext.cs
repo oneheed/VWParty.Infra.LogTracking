@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using NLog;
+using System.Diagnostics;
 
 namespace VWParty.Infra.LogTracking
 {
@@ -28,7 +30,7 @@ namespace VWParty.Infra.LogTracking
 
         public const string _KEY_REQUEST_ID = "X-REQUEST-ID";
         public const string _KEY_REQUEST_START_UTCTIME = "X-REQUEST-START-UTCTIME";
-
+        private static Logger _logger = LogManager.GetCurrentClassLogger();
 
         [Obsolete("請提供明確的 request-id prefix")]
         public static LogTrackerContext Create()
@@ -106,9 +108,14 @@ namespace VWParty.Infra.LogTracking
         /// <returns></returns>
         public static LogTrackerContext Init(LogTrackerContextStorageTypeEnum type, LogTrackerContext context)
         {
-            if (LogTrackerContext.IsEmptyOrNull(context))
+            if (context == null)
             {
-                throw new ArgumentNullException("parameter: context can not be NULL or EMPTY.");
+                Trace.WriteLine(String.Format("{0} | parameter: context can not be NULL.",
+                    DateTime.UtcNow.ToString("yyyy-MM-ddThh:mm:ss.fffZ")));
+#if DEBUG
+                throw new ArgumentNullException("parameter: context can not be NULL.");
+#endif
+                return null;
             }
 
             return Init(
@@ -128,28 +135,29 @@ namespace VWParty.Infra.LogTracking
         /// <returns></returns>
         public static LogTrackerContext Init(LogTrackerContextStorageTypeEnum type, string requestId, DateTime requestStartTimeUTC)
         {
-            if (requestStartTimeUTC.Kind != DateTimeKind.Utc) throw new ArgumentOutOfRangeException("requestStartTimeUTC MUST be UTC time.");
+            if (String.IsNullOrEmpty(requestId) || String.IsNullOrWhiteSpace(requestId))
+            {
+                _logger.Error("LogTrackerContext Init Exception: RequestId MUST NOT be null or empty or white space only.");
+#if DEBUG
+                throw new ArgumentOutOfRangeException("RequestId MUST NOT be null or empty or white space only.");
+#endif
+                return null;
+            }
+            if (requestStartTimeUTC.Kind != DateTimeKind.Utc)
+            {
+                _logger.Error("LogTrackerContext Init Exception: RequestId MUST NOT be null or empty or white space only.");
+#if DEBUG
+                throw new ArgumentOutOfRangeException("requestStartTimeUTC MUST be UTC time.");
+#endif
+                return null;
+            }
 
             switch (type)
             {
                 case LogTrackerContextStorageTypeEnum.ASPNET_HTTPCONTEXT:
 
                     HttpContext.Current.Request.Headers[_KEY_REQUEST_ID] = requestId;
-
-
-                    //HttpContext.Current.Request.Headers.Set(
-                    //    _KEY_REQUEST_ID,
-                    //    requestId);
-
-                    //HttpContext.Current.Request.Headers["X-123"] = "Y-456";
-
-
-
                     HttpContext.Current.Request.Headers[_KEY_REQUEST_START_UTCTIME] = requestStartTimeUTC.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
-
-                    //HttpContext.Current.Request.Headers.Set(
-                    //    _KEY_REQUEST_START_UTCTIME,
-                    //    requestStartTimeUTC.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'"));
 
                     return Current;
 
@@ -183,7 +191,7 @@ namespace VWParty.Infra.LogTracking
         public static void Clean()
         {
             //if (LogTrackerContext.Current != null)
-            if (!LogTrackerContext.IsEmptyOrNull(LogTrackerContext.Current))
+            if (LogTrackerContext.Current != null)
             {
                 Clean(LogTrackerContext.Current.StorageType);
             }
@@ -206,8 +214,7 @@ namespace VWParty.Infra.LogTracking
                 case LogTrackerContextStorageTypeEnum.THREAD_DATASLOT:
                     _thread_static_is_set = false;
                     _thread_static_request_id = null;
-                    //_thread_static_request_start_utctime = DateTime.MinValue;
-                    _thread_static_request_start_utctime = DateTime.Parse("0001-01-01T00:00:00.000Z").ToUniversalTime();
+                    _thread_static_request_start_utctime = DateTime.MinValue;
                     break;
 
                 case LogTrackerContextStorageTypeEnum.OWIN_CONTEXT:
@@ -218,41 +225,12 @@ namespace VWParty.Infra.LogTracking
         }
 
         /// <summary>
-        /// 空白log context
-        /// 1. RequestId = String.Empty
-        /// 2. RequestStartTimeUTC = DateTime.Parse("0001-01-01T00:00:00.000Z").ToUniversalTime()
-        /// </summary>
-        public static LogTrackerContext Empty
-        {
-            get
-            {
-                DateTime utcMin = DateTime.Parse("0001-01-01T00:00:00.000Z").ToUniversalTime();
-                return LogTrackerContext.Init(LogTrackerContextStorageTypeEnum.NONE, String.Empty, utcMin);
-            }
-        }
-
-        /// <summary>
-        /// 檢查是否為空白log context
-        /// </summary>
-        public static bool IsEmptyOrNull(LogTrackerContext logContext)
-        {
-            bool isEmptyOrNull = false;
-            DateTime utcMinValue = DateTime.Parse("0001-01-01T00:00:00.000Z").ToUniversalTime();
-            if (logContext == null || String.IsNullOrEmpty(logContext.RequestId) ||
-                logContext.RequestStartTimeUTC == utcMinValue || logContext.RequestStartTimeUTC == DateTime.MinValue)
-            {
-                isEmptyOrNull = true;
-            }
-
-            return isEmptyOrNull;
-        }
-
-        /// <summary>
         /// 取得目前作用中的 log context, 會依序搜尋下列 storage:
         /// 1. asp.net web hosting environment (http context)
         /// 2. asp.net owin context (not implement)
         /// 3. .net thread data slot
         /// 若無符合的內容，則會直接 return null;
+        /// Exception: ArgumentNullException, FormatException
         /// </summary>
         public static LogTrackerContext Current
         {
@@ -269,19 +247,38 @@ namespace VWParty.Infra.LogTracking
                 {
                     // in app_start or app_end event handler
                     if(ex is System.Web.HttpException || ex is System.TypeInitializationException)
-                    return LogTrackerContext.Empty;
+                    return null;
                 }
 
                 if (_context != null && string.IsNullOrEmpty(_context.Request.Headers.Get(_KEY_REQUEST_ID)) == false)
                 {
-                    // match in httpcontext
-                    return new LogTrackerContext()
+                    // RequestStartTimeUTC Parse過程可能發生Exception: DateTime格式不合(ArgumentNullException, FormatException)
+                    // Production環境回傳null，Develop環境則直接丟Exception;兩者均會先寫出Trace log
+                    try
                     {
-                        StorageType = LogTrackerContextStorageTypeEnum.ASPNET_HTTPCONTEXT,
-                        RequestId = _context.Request.Headers.Get(_KEY_REQUEST_ID),
-                        RequestStartTimeUTC = //DateTimeOffset.Parse(_context.Request.Headers.Get(_KEY_REQUEST_START_UTCTIME)).UtcDateTime
-                            DateTime.Parse(_context.Request.Headers.Get(_KEY_REQUEST_START_UTCTIME)).ToUniversalTime()
-                    };
+                        return new LogTrackerContext()
+                        {
+                            StorageType = LogTrackerContextStorageTypeEnum.ASPNET_HTTPCONTEXT,
+                            RequestId = _context.Request.Headers.Get(_KEY_REQUEST_ID),
+                            RequestStartTimeUTC = DateTime.Parse(_context.Request.Headers.Get(_KEY_REQUEST_START_UTCTIME)).ToUniversalTime()
+                        };
+                    }
+                    catch(ArgumentNullException ex)
+                    {
+                        _logger.Error(String.Format("LogTrackerContext.Current Exception: {0}", ex.Message));
+#if DEBUG
+                        throw ex;
+#endif
+                        return null;
+                    }
+                    catch(FormatException ex)
+                    {
+                        _logger.Error(String.Format("LogTrackerContext.Current Exception: {0}", ex.Message));
+#if DEBUG
+                        throw ex;
+#endif
+                        return null;
+                    }
                 }
                 else if (false) // TODO: check OWIN environment
                 {
@@ -289,8 +286,8 @@ namespace VWParty.Infra.LogTracking
                     {
                         StorageType = LogTrackerContextStorageTypeEnum.OWIN_CONTEXT,
                         RequestId = null,
-                        //RequestStartTimeUTC = DateTime.MinValue
-                        RequestStartTimeUTC = DateTime.Parse("0001-01-01T00:00:00.000Z").ToUniversalTime()
+                        RequestStartTimeUTC = DateTime.MinValue
+                        //RequestStartTimeUTC = DateTime.Parse("0001-01-01T00:00:00.000Z").ToUniversalTime()
                     };
                 }
                 else if (_thread_static_is_set == true) // check thread environment
@@ -303,7 +300,7 @@ namespace VWParty.Infra.LogTracking
                     };
                 }
 
-                return LogTrackerContext.Empty;
+                return null;
             }
         }
 
@@ -324,8 +321,8 @@ namespace VWParty.Infra.LogTracking
         private static string _thread_static_request_id = null;
 
         [ThreadStatic]
-//        private static DateTime _thread_static_request_start_utctime = DateTime.MinValue;
-        private static DateTime _thread_static_request_start_utctime = DateTime.Parse("0001-01-01T00:00:00.000Z").ToUniversalTime();
+        private static DateTime _thread_static_request_start_utctime = DateTime.MinValue;
+        //private static DateTime _thread_static_request_start_utctime = DateTime.Parse("0001-01-01T00:00:00.000Z").ToUniversalTime();
 
         //private string _local_request_id = null;
         //private DateTime _local_request_start_utctime = DateTime.MinValue;
@@ -357,14 +354,7 @@ namespace VWParty.Infra.LogTracking
         {
             get
             {
-                if (LogTrackerContext.IsEmptyOrNull(this))
-                {
-                    return String.Empty;
-                }
-                else
-                {
-                    return this.RequestStartTimeUTC.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
-                }
+                return this.RequestStartTimeUTC.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
             }
         }
 
@@ -376,14 +366,7 @@ namespace VWParty.Infra.LogTracking
         {
             get
             {
-                if (LogTrackerContext.IsEmptyOrNull(this))
-                {
-                    return TimeSpan.MinValue;
-                }
-                else
-                {
-                    return DateTime.UtcNow - this.RequestStartTimeUTC;
-                }
+                return DateTime.UtcNow - this.RequestStartTimeUTC;
             }
         }
 
@@ -395,14 +378,7 @@ namespace VWParty.Infra.LogTracking
         {
             get
             {
-                if (LogTrackerContext.IsEmptyOrNull(this))
-                {
-                    return String.Empty;
-                }
-                else
-                {
-                    return (DateTime.UtcNow - this.RequestStartTimeUTC).TotalMilliseconds.ToString("000000.000");
-                }
+                return (DateTime.UtcNow - this.RequestStartTimeUTC).TotalMilliseconds.ToString("000000.000");
             }
         }
     }
