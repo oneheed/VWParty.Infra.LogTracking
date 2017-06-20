@@ -118,22 +118,110 @@ Request-ID 與 Request-Start-TimeUTC)。只要能正確掌握 ```LogTrackerContext```, 所
 
 
 
-# 範例 (core)
+
+## 範例: Create() - 建立一組新的 LogTrackerContext (要追蹤事件的起始點)
+
+正常情況下，Context 需要的關鍵資訊 (request-id + start-time) 都會在 API Gateway 階段就準備好。但是仍有部分狀況我們需要手動產生
+這些資訊。有這種需求時，需要用 ```LogTrackerContext.Create()``` 來進行:
+
+```csharp
+// 產生一組新的 context, 只傳回物件, 不儲存在任何 storage
+var context = LogTrackerContext.Create("TEMP-HC", LogTrackerContextStorageTypeEnum.NONE);
+```
+
+若你明確的知道你想要儲存 context 的方式的話，可以直接指定。下列的單元測試片段可以清楚表達這個概念:
+
+```csharp
+        public void Test_BasicThreadDataSlotStorage()
+        {
+            var context = LogTrackerContext.Create("UNITTEST", LogTrackerContextStorageTypeEnum.THREAD_DATASLOT);
+            Assert.AreEqual(
+                context.RequestId,
+                LogTrackerContext.Current.RequestId);
+            Assert.AreEqual(
+                context.RequestStartTimeUTC,
+                LogTrackerContext.Current.RequestStartTimeUTC);
+        }
+```
 
 
-## Create() - 建立一組新的 LogTrackerContext (要追蹤事件的起始點)
+
+## 範例: Init() - 跨越環境時，要承接前一個環境傳遞過來的 LogTrackerContext
+
+若你已經從其他管道取得 context 的兩個關鍵資訊，需要重新 Init 目前的 context 環境的話，可以參考這段 code 的作法:
+
+```csharp
+
+string current_request_id = "DEMO-1234567890";		// 取得目前的 request id
+DateTime current_request_time = DateTime.UtcNow;		// 取得目前的 request start time
+
+// 在指定的 storage 上面 Init context
+LogTrackerContext context = LogTrackerContext.Init(
+    LogTrackerContextStorageTypeEnum.THREAD_DATASLOT,
+    current_request_id,
+    current_request_time);
+
+Console.WriteLine(
+  "TID: {0}, Request-ID: {1}, Request-Time: {2}", 
+  Thread.CurrentThread.ManagedThreadId, 
+  context.RequestId, 
+  context.RequestStartTimeUTC);
+
+```
 
 
-## Init() - 跨越環境時，要承接前一個環境傳遞過來的 LogTrackerContext
+如果你已經從別的管道直接拿到 context 物件，則這步驟可以簡化為:
+
+```csharp
+
+var previous_context = ...; // 取得先前的 context 物件
+
+// 在指定的 storage 上面 Init context
+LogTrackerContext context = LogTrackerContext.Init(
+    LogTrackerContextStorageTypeEnum.THREAD_DATASLOT,
+	previous_context);
+
+Console.WriteLine(
+    "TID: {0}, Request-ID: {1}, Request-Time: {2}", 
+    Thread.CurrentThread.ManagedThreadId, 
+    context.RequestId, 
+    context.RequestStartTimeUTC);
+```
 
 
 ## 取用目前的 LogTrackerContext
 
+如果目前環境的 context 都已正常的 init, 那麼要取得他是很容易的，只要隨時透過 ```LogTrackerContext.Current``` 就能夠拿的到 context 了。
 
+```csharp
+Console.WriteLine(
+    "TID: {0}, Request-ID: {1}, Request-Time: {2}", 
+    Thread.CurrentThread.ManagedThreadId, 
+    LogTrackerContext.Current.RequestId, 
+    LogTrackerContext.Current.RequestStartTimeUTC);
+```
 
-# 範例 (helper)
+其中, RequestExecutingTime 是即時計算的，你可以隨時呼叫他取得 context 被建立 (create) 後到現在隔了多少時間。
+
+```csharp
+Console.WriteLine("Execute Time: {0}", LogTrackerContext.Current.RequestExecutingTime);
+```
+
 
 ## HttpClient Handler
+
+若你需要透過 HttpClient 存取其他的 WebAPI, 同時希望把目前的 context 傳遞下去，那麼可以參考 /POC/POC.Client 這個範例:
+
+```csharp
+    HttpClient client = new HttpClient(new LogTrackerHandler());
+    client.BaseAddress = new Uri("http://localhost:31554/");
+    Console.WriteLine(client.GetAsync("/api/values").Result);
+    Console.WriteLine(client.GetAsync("/api/values/123").Result);
+```
+LogTrackerHandler 會替 HttpClient 建立一組專屬的 context, 並且在之後的兩次呼叫都用同一組 context 傳遞下去。將來
+兩個 WebAPI 的紀錄就可以追蹤到同一筆 request id。
+
+
 
 ## ASP.NET MVC Filter
 
