@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using NLog;
+using System.Diagnostics;
 
 namespace VWParty.Infra.LogTracking
 {
@@ -252,18 +253,18 @@ namespace VWParty.Infra.LogTracking
                     }
                     catch(ArgumentNullException ex)
                     {
+                        Trace.WriteLine(String.Format("LogTrackerContext.Current Exception: {0}", ex.Message));
 #if DEBUG
                         throw ex;
 #endif
-                        LogManager.GetCurrentClassLogger().Debug(String.Format("LogTrackerContext.Current Exception: {0}", ex.Message));
                         return null;
                     }
                     catch(FormatException ex)
                     {
+                        Trace.WriteLine(String.Format("LogTrackerContext.Current Exception: {0}", ex.Message));
 #if DEBUG
                         throw ex;
 #endif
-                        LogManager.GetCurrentClassLogger().Debug(String.Format("LogTrackerContext.Current Exception: {0}", ex.Message));
                         return null;
                     }
                 }
