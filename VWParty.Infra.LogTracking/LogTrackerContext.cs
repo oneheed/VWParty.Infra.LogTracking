@@ -132,11 +132,21 @@ namespace VWParty.Infra.LogTracking
         {
             if (String.IsNullOrEmpty(requestId) || String.IsNullOrWhiteSpace(requestId))
             {
-                throw new ArgumentOutOfRangeException("requestId MUST NOT be null or empty or white space only.");
+                Trace.WriteLine(String.Format("{0} | LogTrackerContext Init fail | RequestId MUST NOT be null or empty or white space only.",
+                    DateTime.UtcNow.ToString("yyyy-MM-ddThh:mm:ss.fffZ")));
+#if DEBUG
+                throw new ArgumentOutOfRangeException("RequestId MUST NOT be null or empty or white space only.");
+#endif
+                return null;
             }
             if (requestStartTimeUTC.Kind != DateTimeKind.Utc)
             {
+                Trace.WriteLine(String.Format("{0} | LogTrackerContext Init fail | RequestId MUST NOT be null or empty or white space only.",
+                    DateTime.UtcNow.ToString("yyyy-MM-ddThh:mm:ss.fffZ")));
+#if DEBUG
                 throw new ArgumentOutOfRangeException("requestStartTimeUTC MUST be UTC time.");
+#endif
+                return null;
             }
 
             switch (type)
