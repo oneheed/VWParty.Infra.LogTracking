@@ -33,14 +33,19 @@ namespace POC.Client
 
 
             //HttpClient client = new HttpClient();
-
-
             HttpClient client = new HttpClient(new LogTrackerHandler());
             client.BaseAddress = new Uri("http://localhost:31554/");
             Console.WriteLine(client.GetAsync("/api/values").Result);
             Console.WriteLine(client.GetAsync("/api/values/123").Result);
 
-
+            // 測試Init錯誤參數
+            LogTrackerContext wrong_request_id = LogTrackerContext.Init(LogTrackerContextStorageTypeEnum.NONE, "", DateTime.UtcNow);
+            LogTrackerContext wrong_start_time = LogTrackerContext.Init(LogTrackerContextStorageTypeEnum.NONE, Guid.NewGuid().ToString(), DateTime.MinValue);
+            // 以下測試需要將LogTrackerHandler中的request_id或start_time如上改成錯誤參數進行測試
+            //HttpClient wrong_http_context = new HttpClient(new LogTrackerHandler());
+            //client.BaseAddress = new Uri("http://localhost:31554/");
+            //Console.WriteLine(wrong_http_context.GetAsync("/api/values").Result);
+            //Console.WriteLine(wrong_http_context.GetAsync("/api/values/123").Result);
         }
     }
 }

@@ -110,7 +110,12 @@ namespace VWParty.Infra.LogTracking
         {
             if (context == null)
             {
-                throw new ArgumentNullException("parameter: context can not be NULL or EMPTY.");
+                Trace.WriteLine(String.Format("{0} | parameter: context can not be NULL.",
+                    DateTime.UtcNow.ToString("yyyy-MM-ddThh:mm:ss.fffZ")));
+#if DEBUG
+                throw new ArgumentNullException("parameter: context can not be NULL.");
+#endif
+                return null;
             }
 
             return Init(
@@ -141,7 +146,7 @@ namespace VWParty.Infra.LogTracking
             }
             if (requestStartTimeUTC.Kind != DateTimeKind.Utc)
             {
-                Trace.WriteLine(String.Format("{0} | LogTrackerContext Init fail | RequestId MUST NOT be null or empty or white space only.",
+                Trace.WriteLine(String.Format("{0} | LogTrackerContext Init fail | requestStartTimeUTC MUST be UTC time.",
                     DateTime.UtcNow.ToString("yyyy-MM-ddThh:mm:ss.fffZ")));
 #if DEBUG
                 throw new ArgumentOutOfRangeException("requestStartTimeUTC MUST be UTC time.");
@@ -212,7 +217,6 @@ namespace VWParty.Infra.LogTracking
                     _thread_static_is_set = false;
                     _thread_static_request_id = null;
                     _thread_static_request_start_utctime = DateTime.MinValue;
-                    //_thread_static_request_start_utctime = DateTime.Parse("0001-01-01T00:00:00.000Z").ToUniversalTime();
                     break;
 
                 case LogTrackerContextStorageTypeEnum.OWIN_CONTEXT:
@@ -251,7 +255,7 @@ namespace VWParty.Infra.LogTracking
                 if (_context != null && string.IsNullOrEmpty(_context.Request.Headers.Get(_KEY_REQUEST_ID)) == false)
                 {
                     // RequestStartTimeUTC Parse過程可能發生Exception: DateTime格式不合(ArgumentNullException, FormatException)
-                    // Production環境回傳null，Develop環境則直接丟Exception
+                    // Production環境回傳null，Develop環境則直接丟Exception;兩者均會先寫出Trace log
                     try
                     {
                         return new LogTrackerContext()
