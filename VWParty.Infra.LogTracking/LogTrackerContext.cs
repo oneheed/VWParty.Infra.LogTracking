@@ -30,7 +30,7 @@ namespace VWParty.Infra.LogTracking
 
         public const string _KEY_REQUEST_ID = "X-REQUEST-ID";
         public const string _KEY_REQUEST_START_UTCTIME = "X-REQUEST-START-UTCTIME";
-
+        private static Logger _logger = LogManager.GetCurrentClassLogger();
 
         [Obsolete("請提供明確的 request-id prefix")]
         public static LogTrackerContext Create()
@@ -137,8 +137,7 @@ namespace VWParty.Infra.LogTracking
         {
             if (String.IsNullOrEmpty(requestId) || String.IsNullOrWhiteSpace(requestId))
             {
-                Trace.WriteLine(String.Format("{0} | LogTrackerContext Init fail | RequestId MUST NOT be null or empty or white space only.",
-                    DateTime.UtcNow.ToString("yyyy-MM-ddThh:mm:ss.fffZ")));
+                _logger.Error("LogTrackerContext Init Exception: RequestId MUST NOT be null or empty or white space only.");
 #if DEBUG
                 throw new ArgumentOutOfRangeException("RequestId MUST NOT be null or empty or white space only.");
 #endif
@@ -146,8 +145,7 @@ namespace VWParty.Infra.LogTracking
             }
             if (requestStartTimeUTC.Kind != DateTimeKind.Utc)
             {
-                Trace.WriteLine(String.Format("{0} | LogTrackerContext Init fail | requestStartTimeUTC MUST be UTC time.",
-                    DateTime.UtcNow.ToString("yyyy-MM-ddThh:mm:ss.fffZ")));
+                _logger.Error("LogTrackerContext Init Exception: RequestId MUST NOT be null or empty or white space only.");
 #if DEBUG
                 throw new ArgumentOutOfRangeException("requestStartTimeUTC MUST be UTC time.");
 #endif
@@ -267,7 +265,7 @@ namespace VWParty.Infra.LogTracking
                     }
                     catch(ArgumentNullException ex)
                     {
-                        Trace.WriteLine(String.Format("LogTrackerContext.Current Exception: {0}", ex.Message));
+                        _logger.Error(String.Format("LogTrackerContext.Current Exception: {0}", ex.Message));
 #if DEBUG
                         throw ex;
 #endif
@@ -275,7 +273,7 @@ namespace VWParty.Infra.LogTracking
                     }
                     catch(FormatException ex)
                     {
-                        Trace.WriteLine(String.Format("LogTrackerContext.Current Exception: {0}", ex.Message));
+                        _logger.Error(String.Format("LogTrackerContext.Current Exception: {0}", ex.Message));
 #if DEBUG
                         throw ex;
 #endif
