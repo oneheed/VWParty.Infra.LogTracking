@@ -260,6 +260,12 @@ LogTrackerHandler 會替 HttpClient 建立一組專屬的 context, 並且在之�
 
 ## NLog Extension
 
+要使用 LogTrackerLogger 輸出到 GrayLog, 必須要將 VWParty.Infra.LogTracking NLog extension 設定到 NLog.config 中, 如下所示:
 
+```xml
+    <extensions>
+        <add assembly="VWParty.Infra.LogTracking"/>
+    </extensions>
+```
 
 
