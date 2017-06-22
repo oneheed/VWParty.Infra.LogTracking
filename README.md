@@ -1,72 +1,72 @@
 [![build status](https://gitlab.66.net/msa/VWParty.Infra.LogTracking/badges/develop/build.svg)](https://gitlab.66.net/msa/VWParty.Infra.LogTracking/commits/develop) (branch: develop)
 ----
 
-# ¦p¦ó³z¹L NuGet ¨ú±o³o­Ó®M¥ó?
+# å¦‚ä½•é€é NuGet å–å¾—é€™å€‹å¥—ä»¶?
 
-®M¥óªºµo¦æ³£³z¹L¤½¥qªº NuGet server ¶i¦æ¡C³o­Ó±M®×¤]¤w¥¿½T³]©w¦n CI / CD ¬yµ{¡C¥u­nµ{¦¡½X±À°e (push)
-¨ì GitLab ´N·|Ä²µo CI-Runner, ¦Û°Ê½sÄ¶¤Î¥´¥]®M¥ó¡A±À°e¨ì NuGet server.
+å¥—ä»¶çš„ç™¼è¡Œéƒ½é€éå…¬å¸çš„ NuGet server é€²è¡Œã€‚é€™å€‹å°ˆæ¡ˆä¹Ÿå·²æ­£ç¢ºè¨­å®šå¥½ CI / CD æµç¨‹ã€‚åªè¦ç¨‹å¼ç¢¼æ¨é€ (push)
+åˆ° GitLab å°±æœƒè§¸ç™¼ CI-Runner, è‡ªå‹•ç·¨è­¯åŠæ‰“åŒ…å¥—ä»¶ï¼Œæ¨é€åˆ° NuGet server.
 
-¤½¥qªº NuGet Server URL:
+å…¬å¸çš„ NuGet Server URL:
 
-develop branch: ¦Û°Êµo¦æ BETA ª©¥» (pre-release)
-master branch:  ¦Û°Êµo¦æ¥¿¦¡ª© (release)
+develop branch: è‡ªå‹•ç™¼è¡Œ BETA ç‰ˆæœ¬ (pre-release)
+master branch:  è‡ªå‹•ç™¼è¡Œæ­£å¼ç‰ˆ (release)
 
 
-¦p¦ó¨ú±o³Ì·sª© (release)
+å¦‚ä½•å–å¾—æœ€æ–°ç‰ˆ (release)
 ```powershell
 install-package VWParty.Infra.LogTracking
 ```
 
-¦p¦ó¨ú±o³Ì·sª© (pre-release, beta)
+å¦‚ä½•å–å¾—æœ€æ–°ç‰ˆ (pre-release, beta)
 ```powershell
 install-package VWParty.Infra.LogTracking -pre
 ```
 
 
-# Solution »¡©ú
+# Solution èªªæ˜
 
-³o­Ó repository ¥]§t¤@­Ó visual studio solution, ¸Ì­±ªº¨C­Ó project ¥Î³~»¡©ú¦p¤U:
+é€™å€‹ repository åŒ…å«ä¸€å€‹ visual studio solution, è£¡é¢çš„æ¯å€‹ project ç”¨é€”èªªæ˜å¦‚ä¸‹:
 
 - POC.Client
 - POC.WebAPI1
 - POC.WebAPI2
 
-> POC ½d¨Ò»¡©ú¡ADemo ¥Ñ Client µo°Ê Http Request , ©I¥s WebAPI1 ´£¨Ñªº REST API
-> WebAPI1 ±µ¨ì request «á¡A¦AÂàµo Http Request µ¹ WebAPI2¡C
-> ÂÇµÛ³o¼Ë¤@³s¦ê©I¥sªº¹Lµ{¡A®i¥Ü LogTrackerContext ªº¹B§@¤è¦¡
+> POC ç¯„ä¾‹èªªæ˜ï¼ŒDemo ç”± Client ç™¼å‹• Http Request , å‘¼å« WebAPI1 æä¾›çš„ REST API
+> WebAPI1 æ¥åˆ° request å¾Œï¼Œå†è½‰ç™¼ Http Request çµ¦ WebAPI2ã€‚
+> è—‰è‘—é€™æ¨£ä¸€é€£ä¸²å‘¼å«çš„éç¨‹ï¼Œå±•ç¤º LogTrackerContext çš„é‹ä½œæ–¹å¼
 
 - VWParty.Infra.LogTracking
-> SDK ±M®×¥»¨­
+> SDK å°ˆæ¡ˆæœ¬èº«
 
 - VWParty.Infra.LogTracking.Tests
-> SDK ªº³æ¤¸´ú¸Õ
+> SDK çš„å–®å…ƒæ¸¬è©¦
 
 
 
-# VWParty.Infra.LogTracking SDK ¨Ï¥Î»¡©ú
+# VWParty.Infra.LogTracking SDK ä½¿ç”¨èªªæ˜
 
-³o®M SDK ¥Øªº¦b¸Ñ¨M: ¸ó¶VªA°Èªº Log Tracking ³Ì¤jªº»ÙÃª¦b©ó¨S¦³²Î¤@ªº KEY ¨Ó°l¬d¬Y­Ó¥ô°È¦b¤£¦PªA°È¤§¶¡ªº³B²z¹Lµ{¡C
-¦]¦¹³]­p³o®M SDK¡A¥Î³æ¤@¤@­Ó Request ID ¨Ó¦ê°_©Ò¦³ªº¬ö¿ı¡C¬°¤F¹F¨ì³o­Ó¥Øªº¡A¦³´X­Ó¹ê§@¤WªºªùÂe»İ­n§JªA:
+é€™å¥— SDK ç›®çš„åœ¨è§£æ±º: è·¨è¶Šæœå‹™çš„ Log Tracking æœ€å¤§çš„éšœç¤™åœ¨æ–¼æ²’æœ‰çµ±ä¸€çš„ KEY ä¾†è¿½æŸ¥æŸå€‹ä»»å‹™åœ¨ä¸åŒæœå‹™ä¹‹é–“çš„è™•ç†éç¨‹ã€‚
+å› æ­¤è¨­è¨ˆé€™å¥— SDKï¼Œç”¨å–®ä¸€ä¸€å€‹ Request ID ä¾†ä¸²èµ·æ‰€æœ‰çš„ç´€éŒ„ã€‚ç‚ºäº†é”åˆ°é€™å€‹ç›®çš„ï¼Œæœ‰å¹¾å€‹å¯¦ä½œä¸Šçš„é–€æª»éœ€è¦å…‹æœ:
 
-1. ¦ó®É²£¥Í Request ID ?
-2. Request ID ¦p¦ó¶Ç»¼¨ì¤U¤@­ÓªA°È ?
-3. ³o®M¾÷¨î¯à§_¸ò Logger ¾ã¦X ?
-4. ¾É¤J³o®M¾÷¨î¬O§_»İ­n¤j´T§ï¼g¬J¦³ªº Application ?
+1. ä½•æ™‚ç”¢ç”Ÿ Request ID ?
+2. Request ID å¦‚ä½•å‚³éåˆ°ä¸‹ä¸€å€‹æœå‹™ ?
+3. é€™å¥—æ©Ÿåˆ¶èƒ½å¦è·Ÿ Logger æ•´åˆ ?
+4. å°å…¥é€™å¥—æ©Ÿåˆ¶æ˜¯å¦éœ€è¦å¤§å¹…æ”¹å¯«æ—¢æœ‰çš„ Application ?
 
-¦]¦¹¡A¹ïÀ³ªº SDK ´N³]­p¤F³o®M¾÷¨î¡A¶°¤¤³B²z¸ò¸ó¶VªA°È°lÂÜ Log ¬ÛÃöªº©Ò¦³°İÃD:
+å› æ­¤ï¼Œå°æ‡‰çš„ SDK å°±è¨­è¨ˆäº†é€™å¥—æ©Ÿåˆ¶ï¼Œé›†ä¸­è™•ç†è·Ÿè·¨è¶Šæœå‹™è¿½è¹¤ Log ç›¸é—œçš„æ‰€æœ‰å•é¡Œ:
 
 
 ## LogTrackerContext
 
-```LogTrackerContext``` ¬O³o®M SDK ªº®Ö¤ß¾÷¨î¡C```LogTrackerContext``` ª«¥ó¥Nªí¤F¥Ø«e Log Tracking ªºÃöÁä¸ê°T (¥Ø«e¹ê§@ªºÃöÁä¸ê°T¦³¨â­Ó:
-Request-ID »P Request-Start-TimeUTC)¡C¥u­n¯à¥¿½T´x´¤ ```LogTrackerContext```, ©Ò¦³ªº Log ¾÷¨î´N¯à¥¿½Tªº¿é¥X Log, ¨Æ«á´N¯à¥¿½Tªº
-ÁÙ­ì¬Y­Ó¥ô°È¦b©Ò¦³ªºªA°È¤¤³B²zªº¸Ô²Ó°O¿ı¡C
+```LogTrackerContext``` æ˜¯é€™å¥— SDK çš„æ ¸å¿ƒæ©Ÿåˆ¶ã€‚```LogTrackerContext``` ç‰©ä»¶ä»£è¡¨äº†ç›®å‰ Log Tracking çš„é—œéµè³‡è¨Š (ç›®å‰å¯¦ä½œçš„é—œéµè³‡è¨Šæœ‰å…©å€‹:
+Request-ID èˆ‡ Request-Start-TimeUTC)ã€‚åªè¦èƒ½æ­£ç¢ºæŒæ¡ ```LogTrackerContext```, æ‰€æœ‰çš„ Log æ©Ÿåˆ¶å°±èƒ½æ­£ç¢ºçš„è¼¸å‡º Log, äº‹å¾Œå°±èƒ½æ­£ç¢ºçš„
+é‚„åŸæŸå€‹ä»»å‹™åœ¨æ‰€æœ‰çš„æœå‹™ä¸­è™•ç†çš„è©³ç´°è¨˜éŒ„ã€‚
 
-```LogTrackerContext``` ¥u¯à³z¹L ```LogTrackerContext.Create()``` ¤èªk¨Ó«Ø¥ß¡C«Ø¥ßªº°Ê§@·|²£¥Í¤@µ§·sªº unique id §@¬° Request-ID, ¤]·|§â¥Ø«eªº®É¶¡ (UTC)
-¤@°_°O¿ı¤U¨Ó¡A¤è«K±N¨Ó¥Î¥ô°È±Ò°Ê¨ºÀş¶¡ªº¬Û¹ï®É¶¡¨Ó°l¬d°T®§¡C
+```LogTrackerContext``` åªèƒ½é€é ```LogTrackerContext.Create()``` æ–¹æ³•ä¾†å»ºç«‹ã€‚å»ºç«‹çš„å‹•ä½œæœƒç”¢ç”Ÿä¸€ç­†æ–°çš„ unique id ä½œç‚º Request-ID, ä¹ŸæœƒæŠŠç›®å‰çš„æ™‚é–“ (UTC)
+ä¸€èµ·è¨˜éŒ„ä¸‹ä¾†ï¼Œæ–¹ä¾¿å°‡ä¾†ç”¨ä»»å‹™å•Ÿå‹•é‚£ç¬é–“çš„ç›¸å°æ™‚é–“ä¾†è¿½æŸ¥è¨Šæ¯ã€‚
 
-```LogTrackerContext``` «Ø¥ß (```Create```) «á¡A¶}µoªÌ¥²¶·µø±¡ªp¨M©w¦p¦ó§â¥¦«O¦s¤U¨Ó¡AÅı¨ä¥L code ¯à©ú½T¦a§ä¨ì? ³o¨Ç«O¦sªº¤è¦¡©w¸q¦b
-```LogTrackerContextStorageTypeEnum```, ¥Ø«e¦³©w¸qªºÀx¦s¤è¦¡¦³:
+```LogTrackerContext``` å»ºç«‹ (```Create```) å¾Œï¼Œé–‹ç™¼è€…å¿…é ˆè¦–æƒ…æ³æ±ºå®šå¦‚ä½•æŠŠå®ƒä¿å­˜ä¸‹ä¾†ï¼Œè®“å…¶ä»– code èƒ½æ˜ç¢ºåœ°æ‰¾åˆ°? é€™äº›ä¿å­˜çš„æ–¹å¼å®šç¾©åœ¨
+```LogTrackerContextStorageTypeEnum```, ç›®å‰æœ‰å®šç¾©çš„å„²å­˜æ–¹å¼æœ‰:
 
 ```csharp
     public enum LogTrackerContextStorageTypeEnum : int
@@ -77,41 +77,41 @@ Request-ID »P Request-Start-TimeUTC)¡C¥u­n¯à¥¿½T´x´¤ ```LogTrackerContext```, ©Ò
         NONE
     }
 ```
-- ```NONE```, ¤£Àx¦s¡A¥Ñ¶}µo¤H­û¦Û¦æ«O¯d»P¶Ç»¼
-- ```ASPNET_HTTPCONTEXT```, Àx¦s¦b ```HttpContext``` ªº Request Header ¤º, ¥u­­ ASP.NET À³¥Îµ{¦¡¤º¨Ï¥Î¡C¥u­n¦b¦P¤@­Ó Http Request ªº pipeline ¤º³£¯à¦s¨ú¡C
-- ```OWIN_CONTEXT```, Àx¦s¦b ```OwinContext``` ªº Request ¤º (¥Ø«e©|¥¼¹ê§@)
-- ```THREAD_DATASLOT```, Àx¦s¦b¥Ø«eªº thread ±MÄİÀx¦sªÅ¶¡¤º¡C¥u­n¦b¦P¤@­Ó thread ¥H¤U³£¯à°÷¦s¨ú¡C­Yµ{¦¡°õ¦æ·|¸ó¶V¤£¦P threads, «h¥²¶·¤â°Ê¦ê±µÂà²¾
+- ```NONE```, ä¸å„²å­˜ï¼Œç”±é–‹ç™¼äººå“¡è‡ªè¡Œä¿ç•™èˆ‡å‚³é
+- ```ASPNET_HTTPCONTEXT```, å„²å­˜åœ¨ ```HttpContext``` çš„ Request Header å…§, åªé™ ASP.NET æ‡‰ç”¨ç¨‹å¼å…§ä½¿ç”¨ã€‚åªè¦åœ¨åŒä¸€å€‹ Http Request çš„ pipeline å…§éƒ½èƒ½å­˜å–ã€‚
+- ```OWIN_CONTEXT```, å„²å­˜åœ¨ ```OwinContext``` çš„ Request å…§ (ç›®å‰å°šæœªå¯¦ä½œ)
+- ```THREAD_DATASLOT```, å„²å­˜åœ¨ç›®å‰çš„ thread å°ˆå±¬å„²å­˜ç©ºé–“å…§ã€‚åªè¦åœ¨åŒä¸€å€‹ thread ä»¥ä¸‹éƒ½èƒ½å¤ å­˜å–ã€‚è‹¥ç¨‹å¼åŸ·è¡Œæœƒè·¨è¶Šä¸åŒ threads, å‰‡å¿…é ˆæ‰‹å‹•ä¸²æ¥è½‰ç§»
 
-¸ó¶V¤£¦Pªº Context, «h¥²¶·©ú½TªºÂà²¾¥Ø«eªº ```LogTrackerContext```. ¦pªG§A·Q¦ê±µ«e­±Ãö¥d¶Ç»¼¹L¨Óªº ```LogTrackerContext```, ½Ğ¥Î ```LogTrackerContext.Init()``` ¨Ó©Ó±µ
-«e­±ªº Context, ¨Ã¥B§â¥¦Àx¦s¦b¦X¾Aªº Storage ¤º¡C
-
-
-¹ê»ÚÀ³¥Îªºª¬ªp¤U¡A¥D­n´N¬O¦Ò¼{¨â¥ó¨Æ±¡:
-1. ¦ó®É­n²£¥Í ```LogTrackerContext``` ?
-2. ­n¦p¦ó¦ê±µ ```LogTrackerContext``` ?
-
-¥H¤U¤À§O»¡©ú³o¨â­Ó°Ê§@:
-
-### ¦ó®É²£¥Í Context ?
-
-¥Ø«e¾ã®M¾÷¨î¡A¦³´X­Ó¾A¦X²£¥Í ```LogTrackerContext``` ªº®É¾÷:
-
-1. ¸g¹L API Gateway ®É¦Û°Ê«Ø¥ß (¤w§¹¦¨)
-¥u­n¬O³z¹L API Gateway Âà°eªº API Call, ³£·|¦Û°Ê¦b Header ¤º¦s©ñ ```LogTrackerContext``` ÃöÁä¸ê°T¡C
-2. WebAPI ®M¥Î ```LogTrackerAttribute```, ®Ä¥Î¦p¦P API Gateway, ¸g¹L ```Controller``` ´N·|¦Û°Ê«Ø¥ß
-3. ¨ä¥L¡A¥Ñ¶}µoªÌ¦Û¦æ©I¥s ```LogTrackerContext.Create()``` «Ø¥ß
+è·¨è¶Šä¸åŒçš„ Context, å‰‡å¿…é ˆæ˜ç¢ºçš„è½‰ç§»ç›®å‰çš„ ```LogTrackerContext```. å¦‚æœä½ æƒ³ä¸²æ¥å‰é¢é—œå¡å‚³ééä¾†çš„ ```LogTrackerContext```, è«‹ç”¨ ```LogTrackerContext.Init()``` ä¾†æ‰¿æ¥
+å‰é¢çš„ Context, ä¸¦ä¸”æŠŠå®ƒå„²å­˜åœ¨åˆé©çš„ Storage å…§ã€‚
 
 
-¶Ç»¼ªº¾÷¨î¡A¥Ø«e SDK ¤]·Ç³Æ¤F´X­Ó±`¥ÎªººŞ¹D¡A§Q©ó²Î¤@³B²z:
+å¯¦éš›æ‡‰ç”¨çš„ç‹€æ³ä¸‹ï¼Œä¸»è¦å°±æ˜¯è€ƒæ…®å…©ä»¶äº‹æƒ…:
+1. ä½•æ™‚è¦ç”¢ç”Ÿ ```LogTrackerContext``` ?
+2. è¦å¦‚ä½•ä¸²æ¥ ```LogTrackerContext``` ?
 
-1. HttpClient Handler - ­Y§A³z¹L ```HttpClient``` ©I¥s WebAPI, ³z¹L HttpClient Handler ´N¯à¦Û°Ê¦a§â¥Ø«e ```LogTrackerContext``` ³z¹L Request Headers Âà°e¨ì¤U¤@Ãö¡C
-2. ASP.NET MVC Filter - ­Y«eºİ¤w¸g³z¹L Request Header ¶Ç»¼ ```LogTrackerContext```, «h¥u­n¼Ğ°O Filter Attribute, ´N¯à¦Û°Ê©Ó±µ¨Ó¦Û Request Headers ªº ```LogTrackerContext```, ­YµL«h·|¦Û¤v²£¥Í¤@²Õ¡C¨Ã¥B¦A API ©I¥sªº«e«á¤À§O¼g¤U¤@µ§ Log
-(µù: §A¤£»İ­n³z¹L Filter, ¤]¯à³z¹L ```LogTrackerContext.Current``` ¨ú±o¤W¤@Ãö¶Ç»¼¹L¨Óªº ```LogTrackerContext```)
+ä»¥ä¸‹åˆ†åˆ¥èªªæ˜é€™å…©å€‹å‹•ä½œ:
 
-¬°¤F¤è«K¦b¤é»x¸Ì­±¼Ğ¥Ü ```LogTrackerContext``` ªº¸ê°T¡ASDK ¤]°µ¤F¤U¦C¾ã¦X»P³B²z:
+### ä½•æ™‚ç”¢ç”Ÿ Context ?
 
-1. µ²¦X¬J¦³ªº Mnemosyne Logger, ³z¹L Logger ¿é¥X¨ì GrayLog ªº¬ö¿ı¡A³£·|¦Û°Êªş¥[¥Ø«eÀô¹Òªº request-id, request-start-time, request-execute-time
-2. ­Y­n³z¹L NLog ¿é¥X¡A«h SDK ¤]´£¨Ñ¤F renderer: ${vwparty-request-id} µ¥¡C¨Ò¦p:
+ç›®å‰æ•´å¥—æ©Ÿåˆ¶ï¼Œæœ‰å¹¾å€‹é©åˆç”¢ç”Ÿ ```LogTrackerContext``` çš„æ™‚æ©Ÿ:
+
+1. ç¶“é API Gateway æ™‚è‡ªå‹•å»ºç«‹ (å·²å®Œæˆ)
+åªè¦æ˜¯é€é API Gateway è½‰é€çš„ API Call, éƒ½æœƒè‡ªå‹•åœ¨ Header å…§å­˜æ”¾ ```LogTrackerContext``` é—œéµè³‡è¨Šã€‚
+2. WebAPI å¥—ç”¨ ```LogTrackerAttribute```, æ•ˆç”¨å¦‚åŒ API Gateway, ç¶“é ```Controller``` å°±æœƒè‡ªå‹•å»ºç«‹
+3. å…¶ä»–ï¼Œç”±é–‹ç™¼è€…è‡ªè¡Œå‘¼å« ```LogTrackerContext.Create()``` å»ºç«‹
+
+
+å‚³éçš„æ©Ÿåˆ¶ï¼Œç›®å‰ SDK ä¹Ÿæº–å‚™äº†å¹¾å€‹å¸¸ç”¨çš„ç®¡é“ï¼Œåˆ©æ–¼çµ±ä¸€è™•ç†:
+
+1. HttpClient Handler - è‹¥ä½ é€é ```HttpClient``` å‘¼å« WebAPI, é€é HttpClient Handler å°±èƒ½è‡ªå‹•åœ°æŠŠç›®å‰ ```LogTrackerContext``` é€é Request Headers è½‰é€åˆ°ä¸‹ä¸€é—œã€‚
+2. ASP.NET MVC Filter - è‹¥å‰ç«¯å·²ç¶“é€é Request Header å‚³é ```LogTrackerContext```, å‰‡åªè¦æ¨™è¨˜ Filter Attribute, å°±èƒ½è‡ªå‹•æ‰¿æ¥ä¾†è‡ª Request Headers çš„ ```LogTrackerContext```, è‹¥ç„¡å‰‡æœƒè‡ªå·±ç”¢ç”Ÿä¸€çµ„ã€‚ä¸¦ä¸”å† API å‘¼å«çš„å‰å¾Œåˆ†åˆ¥å¯«ä¸‹ä¸€ç­† Log
+(è¨»: ä½ ä¸éœ€è¦é€é Filter, ä¹Ÿèƒ½é€é ```LogTrackerContext.Current``` å–å¾—ä¸Šä¸€é—œå‚³ééä¾†çš„ ```LogTrackerContext```)
+
+ç‚ºäº†æ–¹ä¾¿åœ¨æ—¥èªŒè£¡é¢æ¨™ç¤º ```LogTrackerContext``` çš„è³‡è¨Šï¼ŒSDK ä¹Ÿåšäº†ä¸‹åˆ—æ•´åˆèˆ‡è™•ç†:
+
+1. çµåˆæ—¢æœ‰çš„ Mnemosyne Logger, é€é Logger è¼¸å‡ºåˆ° GrayLog çš„ç´€éŒ„ï¼Œéƒ½æœƒè‡ªå‹•é™„åŠ ç›®å‰ç’°å¢ƒçš„ request-id, request-start-time, request-execute-time
+2. è‹¥è¦é€é NLog è¼¸å‡ºï¼Œå‰‡ SDK ä¹Ÿæä¾›äº† renderer: ${vwparty-request-id} ç­‰ã€‚ä¾‹å¦‚:
 ```xml
     <variable name="Layout" value="${longdate} (${vwparty-request-id},${vwparty-request-time},${vwparty-request-execute}) | ${message} ${newline}"/>
 ```
@@ -119,17 +119,17 @@ Request-ID »P Request-Start-TimeUTC)¡C¥u­n¯à¥¿½T´x´¤ ```LogTrackerContext```, ©Ò
 
 
 
-## ½d¨Ò: Create() - «Ø¥ß¤@²Õ·sªº LogTrackerContext (­n°lÂÜ¨Æ¥óªº°_©lÂI)
+## ç¯„ä¾‹: Create() - å»ºç«‹ä¸€çµ„æ–°çš„ LogTrackerContext (è¦è¿½è¹¤äº‹ä»¶çš„èµ·å§‹é»)
 
-¥¿±`±¡ªp¤U¡AContext »İ­nªºÃöÁä¸ê°T (request-id + start-time) ³£·|¦b API Gateway ¶¥¬q´N·Ç³Æ¦n¡C¦ı¬O¤´¦³³¡¤Àª¬ªp§Ú­Ì»İ­n¤â°Ê²£¥Í
-³o¨Ç¸ê°T¡C¦³³oºØ»İ¨D®É¡A»İ­n¥Î ```LogTrackerContext.Create()``` ¨Ó¶i¦æ:
+æ­£å¸¸æƒ…æ³ä¸‹ï¼ŒContext éœ€è¦çš„é—œéµè³‡è¨Š (request-id + start-time) éƒ½æœƒåœ¨ API Gateway éšæ®µå°±æº–å‚™å¥½ã€‚ä½†æ˜¯ä»æœ‰éƒ¨åˆ†ç‹€æ³æˆ‘å€‘éœ€è¦æ‰‹å‹•ç”¢ç”Ÿ
+é€™äº›è³‡è¨Šã€‚æœ‰é€™ç¨®éœ€æ±‚æ™‚ï¼Œéœ€è¦ç”¨ ```LogTrackerContext.Create()``` ä¾†é€²è¡Œ:
 
 ```csharp
-// ²£¥Í¤@²Õ·sªº context, ¥u¶Ç¦^ª«¥ó, ¤£Àx¦s¦b¥ô¦ó storage
+// ç”¢ç”Ÿä¸€çµ„æ–°çš„ context, åªå‚³å›ç‰©ä»¶, ä¸å„²å­˜åœ¨ä»»ä½• storage
 var context = LogTrackerContext.Create("TEMP-HC", LogTrackerContextStorageTypeEnum.NONE);
 ```
 
-­Y§A©ú½Tªºª¾¹D§A·Q­nÀx¦s context ªº¤è¦¡ªº¸Ü¡A¥i¥Hª½±µ«ü©w¡C¤U¦Cªº³æ¤¸´ú¸Õ¤ù¬q¥i¥H²M·¡ªí¹F³o­Ó·§©À:
+è‹¥ä½ æ˜ç¢ºçš„çŸ¥é“ä½ æƒ³è¦å„²å­˜ context çš„æ–¹å¼çš„è©±ï¼Œå¯ä»¥ç›´æ¥æŒ‡å®šã€‚ä¸‹åˆ—çš„å–®å…ƒæ¸¬è©¦ç‰‡æ®µå¯ä»¥æ¸…æ¥šè¡¨é”é€™å€‹æ¦‚å¿µ:
 
 ```csharp
         public void Test_BasicThreadDataSlotStorage()
@@ -146,16 +146,16 @@ var context = LogTrackerContext.Create("TEMP-HC", LogTrackerContextStorageTypeEn
 
 
 
-## ½d¨Ò: Init() - ¸ó¶VÀô¹Ò®É¡A­n©Ó±µ«e¤@­ÓÀô¹Ò¶Ç»¼¹L¨Óªº LogTrackerContext
+## ç¯„ä¾‹: Init() - è·¨è¶Šç’°å¢ƒæ™‚ï¼Œè¦æ‰¿æ¥å‰ä¸€å€‹ç’°å¢ƒå‚³ééä¾†çš„ LogTrackerContext
 
-­Y§A¤w¸g±q¨ä¥LºŞ¹D¨ú±o context ªº¨â­ÓÃöÁä¸ê°T¡A»İ­n­«·s Init ¥Ø«eªº context Àô¹Òªº¸Ü¡A¥i¥H°Ñ¦Ò³o¬q code ªº§@ªk:
+è‹¥ä½ å·²ç¶“å¾å…¶ä»–ç®¡é“å–å¾— context çš„å…©å€‹é—œéµè³‡è¨Šï¼Œéœ€è¦é‡æ–° Init ç›®å‰çš„ context ç’°å¢ƒçš„è©±ï¼Œå¯ä»¥åƒè€ƒé€™æ®µ code çš„ä½œæ³•:
 
 ```csharp
 
-string current_request_id = "DEMO-1234567890";		// ¨ú±o¥Ø«eªº request id
-DateTime current_request_time = DateTime.UtcNow;		// ¨ú±o¥Ø«eªº request start time
+string current_request_id = "DEMO-1234567890";		// å–å¾—ç›®å‰çš„ request id
+DateTime current_request_time = DateTime.UtcNow;		// å–å¾—ç›®å‰çš„ request start time
 
-// ¦b«ü©wªº storage ¤W­± Init context
+// åœ¨æŒ‡å®šçš„ storage ä¸Šé¢ Init context
 LogTrackerContext context = LogTrackerContext.Init(
     LogTrackerContextStorageTypeEnum.THREAD_DATASLOT,
     current_request_id,
@@ -170,13 +170,13 @@ Console.WriteLine(
 ```
 
 
-¦pªG§A¤w¸g±q§OªººŞ¹Dª½±µ®³¨ì context ª«¥ó¡A«h³o¨BÆJ¥i¥HÂ²¤Æ¬°:
+å¦‚æœä½ å·²ç¶“å¾åˆ¥çš„ç®¡é“ç›´æ¥æ‹¿åˆ° context ç‰©ä»¶ï¼Œå‰‡é€™æ­¥é©Ÿå¯ä»¥ç°¡åŒ–ç‚º:
 
 ```csharp
 
-var previous_context = ...; // ¨ú±o¥ı«eªº context ª«¥ó
+var previous_context = ...; // å–å¾—å…ˆå‰çš„ context ç‰©ä»¶
 
-// ¦b«ü©wªº storage ¤W­± Init context
+// åœ¨æŒ‡å®šçš„ storage ä¸Šé¢ Init context
 LogTrackerContext context = LogTrackerContext.Init(
     LogTrackerContextStorageTypeEnum.THREAD_DATASLOT,
 	previous_context);
@@ -189,9 +189,9 @@ Console.WriteLine(
 ```
 
 
-## ¨ú¥Î¥Ø«eªº LogTrackerContext
+## å–ç”¨ç›®å‰çš„ LogTrackerContext
 
-¦pªG¥Ø«eÀô¹Òªº context ³£¤w¥¿±`ªº init, ¨º»ò­n¨ú±o¥L¬O«Ü®e©öªº¡A¥u­nÀH®É³z¹L ```LogTrackerContext.Current``` ´N¯à°÷®³ªº¨ì context ¤F¡C
+å¦‚æœç›®å‰ç’°å¢ƒçš„ context éƒ½å·²æ­£å¸¸çš„ init, é‚£éº¼è¦å–å¾—ä»–æ˜¯å¾ˆå®¹æ˜“çš„ï¼Œåªè¦éš¨æ™‚é€é ```LogTrackerContext.Current``` å°±èƒ½å¤ æ‹¿çš„åˆ° context äº†ã€‚
 
 ```csharp
 Console.WriteLine(
@@ -201,7 +201,7 @@ Console.WriteLine(
     LogTrackerContext.Current.RequestStartTimeUTC);
 ```
 
-¨ä¤¤, RequestExecutingTime ¬O§Y®É­pºâªº¡A§A¥i¥HÀH®É©I¥s¥L¨ú±o context ³Q«Ø¥ß (create) «á¨ì²{¦b¹j¤F¦h¤Ö®É¶¡¡C
+å…¶ä¸­, RequestExecutingTime æ˜¯å³æ™‚è¨ˆç®—çš„ï¼Œä½ å¯ä»¥éš¨æ™‚å‘¼å«ä»–å–å¾— context è¢«å»ºç«‹ (create) å¾Œåˆ°ç¾åœ¨éš”äº†å¤šå°‘æ™‚é–“ã€‚
 
 ```csharp
 Console.WriteLine("Execute Time: {0}", LogTrackerContext.Current.RequestExecutingTime);
@@ -210,7 +210,7 @@ Console.WriteLine("Execute Time: {0}", LogTrackerContext.Current.RequestExecutin
 
 ## HttpClient Handler
 
-­Y§A»İ­n³z¹L HttpClient ¦s¨ú¨ä¥Lªº WebAPI, ¦P®É§Æ±æ§â¥Ø«eªº context ¶Ç»¼¤U¥h¡A¨º»ò¥i¥H°Ñ¦Ò /POC/POC.Client ³o­Ó½d¨Ò:
+è‹¥ä½ éœ€è¦é€é HttpClient å­˜å–å…¶ä»–çš„ WebAPI, åŒæ™‚å¸Œæœ›æŠŠç›®å‰çš„ context å‚³éä¸‹å»ï¼Œé‚£éº¼å¯ä»¥åƒè€ƒ /POC/POC.Client é€™å€‹ç¯„ä¾‹:
 
 ```csharp
     HttpClient client = new HttpClient(new LogTrackerHandler());
@@ -218,12 +218,23 @@ Console.WriteLine("Execute Time: {0}", LogTrackerContext.Current.RequestExecutin
     Console.WriteLine(client.GetAsync("/api/values").Result);
     Console.WriteLine(client.GetAsync("/api/values/123").Result);
 ```
-LogTrackerHandler ·|´À HttpClient «Ø¥ß¤@²Õ±MÄİªº context, ¨Ã¥B¦b¤§«áªº¨â¦¸©I¥s³£¥Î¦P¤@²Õ context ¶Ç»¼¤U¥h¡C±N¨Ó
-¨â­Ó WebAPI ªº¬ö¿ı´N¥i¥H°lÂÜ¨ì¦P¤@µ§ request id¡C
+LogTrackerHandler æœƒæ›¿ HttpClient å»ºç«‹ä¸€çµ„å°ˆå±¬çš„ context, ä¸¦ä¸”åœ¨ä¹‹å¾Œçš„å…©æ¬¡å‘¼å«éƒ½ç”¨åŒä¸€çµ„ context å‚³éä¸‹å»ã€‚å°‡ä¾†
+å…©å€‹ WebAPI çš„ç´€éŒ„å°±å¯ä»¥è¿½è¹¤åˆ°åŒä¸€ç­† request idã€‚
 
 
 
 ## ASP.NET MVC Filter
+
+è‹¥ä½ æ˜¯é–‹ç™¼ ASP.NET MVC æˆ– WebAPI æ‡‰ç”¨ç¨‹å¼, å¯åƒè€ƒ POC.WebAPI1 æˆ– POC.WebAPI2 é€éä»¥ä¸‹æ–¹å¼, æ‰¿æ¥å‘¼å«ç«¯å‚³é€éä¾†çš„ LogTrackerContext, 
+è‹¥å‘¼å«ç«¯æœªå‚³é€LogTracerContext, å‰‡è‡ªè¡Œç”¢ç”Ÿä¸€çµ„æ–°çš„LogTrackerContext, ç¯„ä¾‹å¦‚ä¸‹:
+
+```csharp
+    [LogTracker(Prefix = "POC1")]
+    public class ValuesController : ApiController
+    {
+        ...
+    }
+```
 
 ## NLog Extension
 
