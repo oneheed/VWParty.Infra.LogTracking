@@ -236,7 +236,30 @@ LogTrackerHandler 會替 HttpClient 建立一組專屬的 context, 並且在之�
     }
 ```
 
+## GrayLog Logger
+
+如果有輸出 Log 到 GrayLog 的需求, 可透過以下方式使用 LogTrackerLogger 搭配 LogMessage 的方式將 Log 輸出到 GrayLog, 
+則 Logger 會自動將 LogTracerContext 內的 request_id, request_start_time_UTC, request_execute_time_ms 合併到輸出內容中, 作法如下:
+
+1.初始化 LogTrackerLogger
+
+```csharp
+    LogTrackerLogger _logger = new LogTrackerLogger(LogManager.GetCurrentClassLogger());
+```
+
+2.使用 LogMessage 格式化輸出到 GrayLog
+
+```csharp
+    _logger.Info(new LogMessage() {
+        ShartMessage = "short message",
+        Message = "message",
+        Exception = Exception型態變數,
+        CustomFields = IDictionary<string, string>()型態變數
+    });
+```
+
 ## NLog Extension
 
-## GrayLog Logger
+
+
 
