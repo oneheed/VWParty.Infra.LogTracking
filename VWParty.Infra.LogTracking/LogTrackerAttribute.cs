@@ -19,7 +19,7 @@ namespace VWParty.Infra.LogTracking
 
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
-            Logger _log = LogManager.GetLogger("LogTracker", actionContext.ControllerContext.Controller.GetType());
+            Logger _log = LogManager.GetLogger("LogTracker");
             try
             {
                 //
