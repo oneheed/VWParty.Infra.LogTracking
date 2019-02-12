@@ -1,9 +1,8 @@
-﻿using NLog;
+﻿using Newtonsoft.Json;
+using NLog;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Net.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 
@@ -14,8 +13,12 @@ namespace VWParty.Infra.LogTracking
     {
         public string Prefix { get; set; }
 
-
         private static LogTrackerLogger _logger = new LogTrackerLogger(LogManager.GetCurrentClassLogger());
+
+        private readonly JsonSerializerSettings _jsonSettings = new JsonSerializerSettings()
+        {
+            Error = (serializer, err) => err.ErrorContext.Handled = true,
+        };
 
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
@@ -41,23 +44,22 @@ namespace VWParty.Infra.LogTracking
                     _log.Info("request_id and request_start_time_utc created.");
                 }
 
+                var arguments = GetArguments(actionContext.ActionArguments);
+                string requestJson = JsonConvert.SerializeObject(arguments, _jsonSettings);
 
-                //_log.Info(string.Format(
-                //    "Before call (request_id: {0}, request_start_time_utc: {1}, request_execute_time_ms: {2})",
-                //    LogTrackerContext.Current.RequestId,
-                //    LogTrackerContext.Current.RequestStartTimeUTC,
-                //    LogTrackerContext.Current.RequestExecutingTime.TotalMilliseconds));
                 _logger.Info(new LogMessage()
                 {
-                    Message = "Before call " + actionContext.ActionDescriptor.ControllerDescriptor.ControllerName + "/" +
-                              actionContext.ActionDescriptor.ActionName,
+                    Message = $"Before call {Prefix} {actionContext.ControllerContext.Request.RequestUri.AbsolutePath}",                    
                     ExtraData = new Dictionary<string, object>()
                     {
-                        { "url", actionContext.Request.RequestUri.AbsoluteUri }
+                        { "RequestId", LogTrackerContext.Current.RequestId },
+                        { "RequestUri", actionContext.Request.RequestUri.AbsoluteUri },
+                        { "RequestBody", actionContext.Request.Content.ReadAsStringAsync().Result},
+                        { "ModelBindingRequest", requestJson},
                     }
                 });
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _log.Warn(ex);
             }
@@ -68,19 +70,20 @@ namespace VWParty.Infra.LogTracking
         {
             Logger _log = LogManager.GetLogger("LogTracker");
             try
-            { 
-                //_log.Info(string.Format(
-                //    "After call (request_id: {0}, request_start_time_utc: {1}, request_execute_time_ms: {2})",
-                //    LogTrackerContext.Current.RequestId,
-                //    LogTrackerContext.Current.RequestStartTimeUTC,
-                //    LogTrackerContext.Current.RequestExecutingTime.TotalMilliseconds));
+            {
+                var arguments = GetArguments(actionExecutedContext.ActionContext.ActionArguments);
+                string requestJson = JsonConvert.SerializeObject(arguments, _jsonSettings);
+
                 _logger.Info(new LogMessage()
                 {
-                    Message = "After call " + actionExecutedContext.ActionContext.ControllerContext.ControllerDescriptor.ControllerName + "/" +
-                              actionExecutedContext.ActionContext.ActionDescriptor.ActionName,
+                    Message = $"After call {Prefix} {actionExecutedContext.ActionContext.ControllerContext.Request.RequestUri.AbsolutePath}",
                     ExtraData = new Dictionary<string, object>()
                     {
-                        { "url", actionExecutedContext.Request.RequestUri.AbsoluteUri }
+                        { "RequestId", LogTrackerContext.Current.RequestId },
+                        { "RequestUri", actionExecutedContext.Request.RequestUri.AbsoluteUri },
+                        { "RequestBody", actionExecutedContext.Request.Content.ReadAsStringAsync().Result},
+                        { "ModelBindingRequest", requestJson},
+                        { "ResponseBody", actionExecutedContext.Response.Content.ReadAsStringAsync().Result}
                     }
                 });
                 if (LogTrackerContext.Current != null)
@@ -100,6 +103,21 @@ namespace VWParty.Infra.LogTracking
             }
 
             base.OnActionExecuted(actionExecutedContext);
+        }
+
+        private IDictionary<string, object> GetArguments(IDictionary<string, object> actionArguments)
+        {
+            var arguments = new Dictionary<string, object>();
+
+            foreach (var actionArgument in actionArguments)
+            {
+                if (actionArgument.Value is HttpRequestMessage)
+                    arguments.Add(actionArgument.Key, (actionArgument.Value as HttpRequestMessage).Content.ReadAsStringAsync());
+                else
+                    arguments.Add(actionArgument.Key, actionArgument.Value);
+            }
+
+            return arguments;
         }
     }
 }
